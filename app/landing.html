@@ -1,0 +1,711 @@
+<a href="#scan" class="skip">Skip to scan</a>
+
+<!-- ============= NAV ============= -->
+<header class="sticky top-0 z-40" style="background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:saturate(150%) blur(8px);border-bottom:1px solid var(--line)">
+  <div class="max-w-5xl mx-auto px-5 md:px-6 h-16 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2.5" aria-label="LeadRadar home">
+      <span aria-hidden="true" class="w-8 h-8 rounded-full grid place-items-center" style="background:var(--brand)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+      </span>
+      <span class="font-extrabold tracking-tight">LeadRadar</span>
+    </a>
+    <nav aria-label="Primary" class="hidden md:flex items-center gap-7 text-[15px]">
+      <a href="#fixes" class="muted hover:text-[color:var(--ink)]">What we fix</a>
+      <a href="#ai" class="muted hover:text-[color:var(--ink)]">AI &amp; data</a>
+      <a href="#pricing" class="muted hover:text-[color:var(--ink)]">Pricing</a>
+      <a href="#faq" class="muted hover:text-[color:var(--ink)]">FAQ</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <a href="#scan" class="btn btn-primary btn-sm">Scan my business</a>
+      <a href="/api/logout" class="muted text-[13px] hover:text-[color:var(--ink)] ml-1 hidden md:inline" aria-label="Log out of the preview">Log out</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============= HERO + SCAN ============= -->
+<main id="main">
+<section id="scan" aria-labelledby="hero-title">
+  <div class="max-w-5xl mx-auto px-5 md:px-6 pt-14 md:pt-24 pb-12">
+    <p class="muted text-[15px] flex items-center gap-2">
+      <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full inline-block" style="background:var(--brand)"></span>
+      For service pros. No SEO jargon.
+    </p>
+
+    <h1 id="hero-title" class="mt-4 text-[clamp(2.5rem,10vw,6.5rem)]">
+      See the jobs your<br/>
+      website is losing.<br/>
+      <span class="brand">In 60 seconds.</span>
+    </h1>
+
+    <p class="mt-6 text-[19px] md:text-[21px] max-w-2xl">
+      Paste your website. We read your Google Business, Yelp, and three nearest competitors.
+      You get a score, the dollar value of lost jobs, and a short list of plain-English fixes.
+      <span class="muted">No passwords. Ever.</span>
+    </p>
+
+    <form id="scanForm" class="mt-10 surface p-3 md:p-4 max-w-3xl flex flex-col md:flex-row gap-2.5 md:items-center" aria-label="Scan my business">
+      <label for="urlInput" class="sr-only">Your website URL</label>
+      <div class="flex items-center gap-3 flex-1 px-2 md:px-4">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted)"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg>
+        <input id="urlInput" name="url" required type="text" autocomplete="off" inputmode="url"
+               placeholder="yourbusiness.com"
+               class="w-full py-4 text-[18px] bg-transparent border-0" style="color:var(--ink)" />
+      </div>
+      <button type="submit" class="btn btn-primary w-full md:w-auto">
+        Scan — free
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </form>
+
+    <ul class="mt-4 text-[14.5px] muted flex flex-wrap gap-x-5 gap-y-1" aria-label="Trust signals">
+      <li>60-second scan</li>
+      <li aria-hidden="true">·</li>
+      <li>No credit card</li>
+      <li aria-hidden="true">·</li>
+      <li>Cancel in 2 taps</li>
+      <li aria-hidden="true">·</li>
+      <li>No auto-renew traps</li>
+    </ul>
+
+    <p class="mt-6 text-[13.5px] muted flex items-center gap-2" aria-live="polite">
+      <span aria-hidden="true" class="relative inline-flex w-2 h-2">
+        <span class="absolute inline-flex h-full w-full rounded-full" style="background:var(--brand);opacity:.35;animation:pulse 1.6s infinite"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2" style="background:var(--brand)"></span>
+      </span>
+      <span id="liveScans" class="tnum">847</span> service pros scanned this week · most recent: <span id="liveRecent" class="tnum">Garage door, Austin TX · 2 min ago</span>
+    </p>
+  </div>
+</section>
+
+<!-- ============= RESULTS (revealed after scan) ============= -->
+<section id="results" aria-live="polite" aria-busy="false">
+  <div class="max-w-5xl mx-auto px-5 md:px-6 pb-12">
+    <div class="surface p-5 md:p-8">
+      <div class="flex flex-wrap items-start gap-5 justify-between">
+        <div>
+          <p class="muted text-[14px]">Report for</p>
+          <p class="text-[22px] font-extrabold tracking-tight" id="domainLabel">yourbusiness.com</p>
+          <p class="mt-1 text-[14px] muted">
+            Category: <span id="categoryLabel" class="text-[color:var(--ink)] font-semibold">Home services</span>
+            · Area: <span id="areaLabel" class="text-[color:var(--ink)] font-semibold">Your metro</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Bento grid: score + leads + revenue -->
+      <div class="mt-7 grid lg:grid-cols-[auto_1fr_1fr] gap-4">
+        <div class="surface p-6 flex items-center gap-6" style="border-radius:var(--radius-lg)">
+          <div class="dial" id="scoreDial" role="img" aria-label="Lead Health Score">
+            <div class="dial-inner">
+              <div class="tnum" id="scoreNum" style="font-size:56px;font-weight:800;letter-spacing:-0.03em">0</div>
+              <div class="muted text-[12px] uppercase tracking-[0.15em] mt-1">of 100</div>
+            </div>
+          </div>
+          <div>
+            <p class="muted text-[12px] uppercase tracking-[0.15em]">Lead Health Score</p>
+            <p class="text-[24px] font-extrabold mt-1" id="scoreLabel">Calculating…</p>
+          </div>
+        </div>
+
+        <div class="surface p-6" style="background:var(--accent-soft);border-color:transparent">
+          <p class="muted text-[12px] uppercase tracking-[0.15em]" style="color:var(--accent)">Missed jobs</p>
+          <p class="mt-3 tnum accent" style="font-size:64px;font-weight:800;line-height:1;letter-spacing:-0.03em"><span id="missedLeads">0</span><span class="text-[18px] muted ml-2 font-semibold" style="color:var(--accent)">/ mo</span></p>
+          <p class="mt-2 text-[14px] muted" style="color:var(--accent)">Calls and quote requests going to competitors.</p>
+        </div>
+
+        <div class="surface p-6" style="background:var(--good-soft);border-color:transparent">
+          <p class="muted text-[12px] uppercase tracking-[0.15em]" style="color:var(--brand)">Revenue lost</p>
+          <p class="mt-3 tnum brand" style="font-size:64px;font-weight:800;line-height:1;letter-spacing:-0.03em"><span class="text-[28px] align-top mr-1">$</span><span id="revLoss">0</span><span class="text-[18px] ml-2 font-semibold" style="color:var(--brand)">/ mo</span></p>
+          <p class="mt-2 text-[14px]" style="color:var(--brand)">Missed jobs × your average ticket.</p>
+        </div>
+      </div>
+
+      <!-- Competitor comparison -->
+      <div class="mt-4 surface p-6" style="border-radius:var(--radius-lg)">
+        <div class="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <p class="muted text-[12px] uppercase tracking-[0.15em]">You vs the 3 nearest competitors</p>
+            <p class="mt-1 text-[18px] font-bold">Within a 10-mile radius</p>
+          </div>
+          <p class="text-[14px] muted">Higher is better</p>
+        </div>
+        <div class="mt-5 space-y-4" id="compBars"></div>
+      </div>
+
+      <!-- Issues -->
+      <div class="mt-8 flex items-end justify-between flex-wrap gap-3">
+        <div>
+          <h2 class="text-[clamp(1.8rem,4vw,2.6rem)]">What's costing you jobs</h2>
+          <p class="mt-1 text-[14.5px] muted">Six high-impact issues, ranked by dollars lost.</p>
+        </div>
+        <p class="text-[14px] muted" id="issueMeta">2 shown · 4 locked</p>
+      </div>
+
+      <div id="issuesGrid" class="mt-5 grid md:grid-cols-2 gap-4" role="list"></div>
+
+      <!-- Honest math -->
+      <div class="mt-7 p-6 md:p-8" style="background:var(--ink);color:var(--bg);border-radius:var(--radius-lg)">
+        <p style="color:color-mix(in srgb,var(--bg) 65%,transparent)" class="text-[12px] uppercase tracking-[0.15em]">Honest math</p>
+        <p class="mt-3 text-[28px] md:text-[38px]" style="font-weight:800;letter-spacing:-0.035em;line-height:1.05">You're losing about <span class="accent" id="leadsRecap">0</span> jobs a month.<br/>Let's stop that this week.</p>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <a href="#pricing" class="btn btn-primary">See the 3 fix options</a>
+          <a href="#pricing" class="btn btn-ghost" style="background:transparent;color:var(--bg);border-color:color-mix(in srgb,var(--bg) 25%,transparent)">Book a 15-min call</a>
+        </div>
+      </div>
+
+      <!-- PDF capture: low-pressure email recovery for non-buyers -->
+      <form id="pdfForm" class="mt-4 surface p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-3 md:gap-5" aria-label="Email me the full PDF report">
+        <div class="flex items-start md:items-center gap-3 md:flex-1">
+          <span aria-hidden="true" class="w-9 h-9 rounded-full grid place-items-center flex-shrink-0" style="background:var(--good-soft);color:var(--brand)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 8h16"/></svg>
+          </span>
+          <div>
+            <p class="font-extrabold text-[16.5px]">Not ready to decide? Get the full PDF.</p>
+            <p class="muted text-[14px]">All 6 fixes, your competitor data, and a 7-day plan. No spam. No follow-up sales calls.</p>
+          </div>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2 md:w-[380px]">
+          <label for="pdfEmail" class="sr-only">Your email</label>
+          <input id="pdfEmail" name="email" type="email" autocomplete="email" placeholder="you@yourbusiness.com"
+                 class="flex-1 px-4 py-3 text-[15.5px] bg-transparent" style="border:1px solid var(--line);border-radius:10px;color:var(--ink);min-height:48px" />
+          <button type="submit" class="btn btn-ink btn-sm">Email me the PDF</button>
+        </div>
+      </form>
+      <p id="pdfConfirm" class="mt-3 text-[14px] text-center" style="display:none;color:var(--brand)" aria-live="polite">On its way — check your inbox in ~60 seconds.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============= SCAN OVERLAY ============= -->
+<div id="scanOverlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="scanTitle">
+  <div class="surface w-full max-w-md p-6 md:p-7">
+    <div class="flex items-center gap-3">
+      <span aria-hidden="true" class="w-10 h-10 rounded-full grid place-items-center" style="background:var(--brand)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+      </span>
+      <div>
+        <p class="muted text-[12px] uppercase tracking-[0.15em]">Local scan in progress</p>
+        <p class="font-extrabold text-[18px]" id="scanTitle"><span id="scanDomain">yourbusiness.com</span></p>
+      </div>
+    </div>
+    <ol class="mt-5 space-y-0" id="scanSteps" aria-label="Scan progress">
+      <li class="step" data-step="1"><span class="dot">✓</span><div class="flex-1"><p class="text-[15px] font-semibold">Reading your website</p><div class="bar mt-1.5"><i></i></div></div></li>
+      <li class="step" data-step="2"><span class="dot">✓</span><div class="flex-1"><p class="text-[15px] font-semibold">Checking Google Business Profile</p><div class="bar mt-1.5"><i></i></div></div></li>
+      <li class="step" data-step="3"><span class="dot">✓</span><div class="flex-1"><p class="text-[15px] font-semibold">Pulling Yelp rating &amp; reviews</p><div class="bar mt-1.5"><i></i></div></div></li>
+      <li class="step" data-step="4"><span class="dot">✓</span><div class="flex-1"><p class="text-[15px] font-semibold">Finding 3 nearest competitors</p><div class="bar mt-1.5"><i></i></div></div></li>
+      <li class="step" data-step="5"><span class="dot">✓</span><div class="flex-1"><p class="text-[15px] font-semibold">Estimating missed jobs &amp; revenue</p><div class="bar mt-1.5"><i></i></div></div></li>
+    </ol>
+    <p class="mt-4 text-[13px] muted">We only read public info. No passwords. No logins.</p>
+  </div>
+</div>
+
+<!-- ============= FIXES (features bento) ============= -->
+<section id="fixes" aria-labelledby="fixes-title">
+  <div class="max-w-5xl mx-auto px-5 md:px-6 py-20 md:py-28">
+    <p class="muted text-[15px] flex items-center gap-2">
+      <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full inline-block" style="background:var(--brand)"></span>
+      What we actually fix
+    </p>
+    <h2 id="fixes-title" class="mt-3 text-[clamp(2rem,6vw,3.6rem)] max-w-3xl">Plain-English fixes.<br/>The ones that move the phone.</h2>
+
+    <div class="mt-12 grid grid-cols-12 gap-4">
+      <article class="col-span-12 md:col-span-7 surface p-7 md:p-8">
+        <p class="muted text-[12px] uppercase tracking-[0.15em]">Google Business</p>
+        <h3 class="mt-3 text-[28px] md:text-[34px]">Own the map pack.</h3>
+        <p class="mt-3 text-[15.5px]">Hours, services, categories, photos, Q&amp;A, post cadence — all the things that decide if your pin shows in the top three when someone taps "plumber near me".</p>
+      </article>
+      <article class="col-span-12 md:col-span-5 p-7 md:p-8" style="background:var(--ink);color:var(--bg);border-radius:var(--radius-lg)">
+        <p class="text-[12px] uppercase tracking-[0.15em]" style="color:color-mix(in srgb,var(--bg) 65%,transparent)">Reviews</p>
+        <h3 class="mt-3 text-[28px] md:text-[34px]" style="color:var(--bg)">Close the review gap.</h3>
+        <p class="mt-3 text-[15.5px]" style="color:color-mix(in srgb,var(--bg) 75%,transparent)">SMS + email review requests after every job. Auto-reply drafts you approve in one tap.</p>
+      </article>
+      <article class="col-span-12 md:col-span-5 surface p-7 md:p-8">
+        <p class="muted text-[12px] uppercase tracking-[0.15em]">ZIP landing pages</p>
+        <h3 class="mt-3 text-[28px] md:text-[34px]">One page, one city, one ranking.</h3>
+        <p class="mt-3 text-[15.5px]">Auto-generated city pages tuned for your trade and radius. Written in plain English, not "SEO copy".</p>
+      </article>
+      <article class="col-span-12 md:col-span-7 surface p-7 md:p-8">
+        <p class="muted text-[12px] uppercase tracking-[0.15em]">Never miss a lead</p>
+        <h3 class="mt-3 text-[28px] md:text-[34px]">Missed-call text-back. <span class="brand">Under 30 seconds.</span></h3>
+        <p class="mt-3 text-[15.5px]">When you can't pick up, we text the caller within 30 seconds so they don't try the next name on the list. The most profitable 30 seconds in this business.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============= AI TRANSPARENCY ============= -->
+<section id="ai" aria-labelledby="ai-title">
+  <div class="max-w-5xl mx-auto px-5 md:px-6 pb-4">
+    <div class="surface p-6 md:p-8">
+      <div class="flex items-start justify-between flex-wrap gap-4">
+        <div>
+          <p class="muted text-[13px] uppercase tracking-[0.15em]">The AI, demystified</p>
+          <h2 id="ai-title" class="mt-2 text-[clamp(1.6rem,4vw,2.3rem)]">Smart where it helps. Out of the way where it shouldn't.</h2>
+        </div>
+        <a href="#faq" class="btn btn-ghost btn-sm self-start">See the FAQ</a>
+      </div>
+      <div class="mt-6 grid md:grid-cols-3 gap-4">
+        <div class="p-5" style="border:1px solid var(--line);border-radius:14px">
+          <p class="text-[12px] uppercase tracking-[0.15em] muted">Model</p>
+          <p class="mt-2 font-extrabold text-[17px]">Claude Sonnet drafts. You approve.</p>
+          <p class="mt-2 text-[14.5px] muted">Replies, GBP posts, and page copy are marked "AI draft" until you tap approve. One-tap undo on everything.</p>
+        </div>
+        <div class="p-5" style="border:1px solid var(--line);border-radius:14px">
+          <p class="text-[12px] uppercase tracking-[0.15em] muted">Your data</p>
+          <p class="mt-2 font-extrabold text-[17px]">Never used for training.</p>
+          <p class="mt-2 text-[14.5px] muted">We read public info and the Google data you connect (read-only). No passwords. No scraping of private accounts.</p>
+        </div>
+        <div class="p-5" style="border:1px solid var(--line);border-radius:14px">
+          <p class="text-[12px] uppercase tracking-[0.15em] muted">Humans in the loop</p>
+          <p class="mt-2 font-extrabold text-[17px]">Real US specialists on Concierge.</p>
+          <p class="mt-2 text-[14.5px] muted">Support is humans too. No chatbot loops when you need help.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= PRICING ============= -->
+<section id="pricing" aria-labelledby="pricing-title">
+  <div class="max-w-5xl mx-auto px-5 md:px-6 py-20 md:py-28">
+    <p class="muted text-[15px] flex items-center gap-2">
+      <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full inline-block" style="background:var(--brand)"></span>
+      Pick your level of help
+    </p>
+    <h2 id="pricing-title" class="mt-3 text-[clamp(2rem,6vw,3.6rem)]">Three ways to plug the leak.</h2>
+    <p class="mt-3 text-[16.5px] max-w-xl">Every plan includes continuous scans, competitor alerts, and a live score.</p>
+
+    <div class="mt-8 surface p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-8" role="note" aria-label="Guarantee and cancellation policy">
+      <div class="flex items-center gap-3">
+        <span aria-hidden="true" class="w-10 h-10 rounded-full grid place-items-center" style="background:var(--good-soft);color:var(--brand)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </span>
+        <div>
+          <p class="font-extrabold text-[17px]">60-day "it paid for itself" guarantee</p>
+          <p class="muted text-[14.5px]">If you don't recover your subscription in new jobs, full refund. No call.</p>
+        </div>
+      </div>
+      <div class="hidden md:block w-px h-10" style="background:var(--line)"></div>
+      <ul class="flex flex-wrap gap-x-5 gap-y-1 text-[14.5px] muted" aria-label="Contract terms">
+        <li><span class="font-semibold text-[color:var(--ink)]">No contract</span></li>
+        <li aria-hidden="true">·</li>
+        <li><span class="font-semibold text-[color:var(--ink)]">No auto-renew</span></li>
+        <li aria-hidden="true">·</li>
+        <li>Cancel in 2 taps — no phone call, no retention form</li>
+      </ul>
+    </div>
+
+    <div class="mt-8 grid md:grid-cols-3 gap-4">
+      <article class="surface p-7 flex flex-col">
+        <p class="muted text-[12px] uppercase tracking-[0.15em]">AI Assistant</p>
+        <h3 class="mt-2 text-[26px]">Hands-on</h3>
+        <p class="mt-4 tnum" style="font-size:52px;font-weight:800;letter-spacing:-0.03em;line-height:1">$79<span class="muted text-[18px] font-semibold ml-1">/mo</span></p>
+        <p class="muted mt-2 text-[14.5px]">For pros who like to ship fixes themselves.</p>
+        <ul class="mt-6 space-y-2.5 text-[15.5px]" style="color:var(--ink)">
+          <li>Weekly scans · live score</li>
+          <li>AI rewrites for GBP &amp; review replies</li>
+          <li>Keyword gap list by ZIP</li>
+          <li>1-click publish to Google Business</li>
+          <li>Competitor overtake alert (SMS)</li>
+        </ul>
+        <p class="mt-5 text-[13px] muted" style="padding-top:14px;border-top:1px dashed var(--line)">Not included: we don't publish fixes for you — you approve and ship.</p>
+        <a href="#" class="mt-auto pt-5"><span class="btn btn-ghost w-full">Start free trial</span></a>
+      </article>
+      <article class="p-7 flex flex-col relative" style="background:var(--brand);color:var(--brand-ink);border-radius:var(--radius-lg)">
+        <span class="absolute -top-3 left-7 text-[11px] font-bold tracking-[0.15em] uppercase px-3 py-1 rounded-full" style="background:var(--ink);color:var(--bg)">Most chosen</span>
+        <p class="text-[12px] uppercase tracking-[0.15em]" style="color:color-mix(in srgb,var(--brand-ink) 75%,transparent)">Full Automation</p>
+        <h3 class="mt-2 text-[26px]" style="color:var(--brand-ink)">Autopilot</h3>
+        <p class="mt-4 tnum" style="font-size:52px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:var(--brand-ink)">$199<span class="text-[18px] font-semibold ml-1" style="color:color-mix(in srgb,var(--brand-ink) 70%,transparent)">/mo</span></p>
+        <p class="mt-2 text-[14.5px]" style="color:color-mix(in srgb,var(--brand-ink) 80%,transparent)">Runs in the background. You see every change before it publishes.</p>
+        <ul class="mt-6 space-y-2.5 text-[15.5px]" style="color:var(--brand-ink)">
+          <li>Daily scans &amp; auto-applied fixes</li>
+          <li>Weekly GBP posts, written for you</li>
+          <li>Review-request automation</li>
+          <li>ZIP landing pages auto-generated</li>
+          <li>Missed-call text-back + lead inbox</li>
+        </ul>
+        <p class="mt-5 text-[13px]" style="padding-top:14px;border-top:1px dashed color-mix(in srgb,var(--brand-ink) 25%,transparent);color:color-mix(in srgb,var(--brand-ink) 75%,transparent)">Not included: paid ads, outbound cold outreach. On purpose.</p>
+        <a href="#" class="mt-auto pt-5"><span class="btn btn-ink w-full">Turn on Autopilot</span></a>
+      </article>
+      <article class="surface p-7 flex flex-col">
+        <p class="muted text-[12px] uppercase tracking-[0.15em]">Done-For-You</p>
+        <h3 class="mt-2 text-[26px]">Concierge</h3>
+        <p class="mt-4 tnum" style="font-size:52px;font-weight:800;letter-spacing:-0.03em;line-height:1">$499<span class="muted text-[18px] font-semibold ml-1">/mo</span></p>
+        <p class="muted mt-2 text-[14.5px]">A real US specialist handles everything.</p>
+        <ul class="mt-6 space-y-2.5 text-[15.5px]" style="color:var(--ink)">
+          <li>Dedicated specialist</li>
+          <li>Full GBP + Yelp + Nextdoor setup</li>
+          <li>Custom ZIP pages &amp; copy</li>
+          <li>Review acquisition campaigns</li>
+          <li>Monthly results call</li>
+        </ul>
+        <p class="mt-5 text-[13px] muted" style="padding-top:14px;border-top:1px dashed var(--line)">Not included: website rebuild. We fix what makes the phone ring, not your site design.</p>
+        <a href="#" class="mt-auto pt-5"><span class="btn btn-ghost w-full">Book a call</span></a>
+      </article>
+    </div>
+
+    <p class="mt-8 text-[15px] muted text-center max-w-2xl mx-auto">
+      A typical scan finds <span class="font-extrabold" style="color:var(--ink)">$8,400–$14,600/month</span> in leaking revenue.
+      Autopilot is <span class="font-extrabold" style="color:var(--brand)">about 2% of that</span>.
+    </p>
+  </div>
+</section>
+
+<!-- ============= TESTIMONIALS ============= -->
+<section aria-labelledby="testimonials-title" class="max-w-5xl mx-auto px-5 md:px-6 pb-20">
+  <h2 id="testimonials-title" class="sr-only">What customers say</h2>
+  <div class="grid md:grid-cols-2 gap-4">
+    <figure class="surface p-7">
+      <p class="text-[18px]" style="line-height:1.45;color:var(--ink)">"LeadRadar told me I was losing 23 calls a month because my hours were wrong on Saturdays. Fixed in four minutes. Booked out this weekend."</p>
+      <figcaption class="mt-5 flex items-center gap-3 text-[14px]">
+        <span aria-hidden="true" class="w-10 h-10 rounded-full" style="background:var(--brand)"></span>
+        <span><span class="font-semibold text-[color:var(--ink)]">Dave Mitchum</span><br/><span class="muted">Mitchum &amp; Sons Plumbing · Tulsa, OK</span></span>
+      </figcaption>
+    </figure>
+    <figure class="surface p-7">
+      <p class="text-[18px]" style="line-height:1.45;color:var(--ink)">"I tried SEMrush. Closed it in five minutes. This is the first tool that told me what to do instead of showing me charts."</p>
+      <figcaption class="mt-5 flex items-center gap-3 text-[14px]">
+        <span aria-hidden="true" class="w-10 h-10 rounded-full" style="background:var(--accent)"></span>
+        <span><span class="font-semibold text-[color:var(--ink)]">Jordan Park</span><br/><span class="muted">Park's Garage Door · Denver, CO</span></span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============= FAQ ============= -->
+<section id="faq" aria-labelledby="faq-title" class="max-w-3xl mx-auto px-5 md:px-6 py-20 md:py-28">
+  <h2 id="faq-title" class="text-[clamp(2rem,6vw,3.6rem)]">Short answers.</h2>
+  <div class="mt-10 space-y-3">
+    <details class="surface p-6">
+      <summary class="flex items-center justify-between gap-4 font-semibold text-[17.5px]">Do you need passwords?<svg class="chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <p class="mt-3 text-[15.5px]">No. The free scan reads public info only. On paid plans, you connect Google Business with one tap — we never ask for site or email passwords.</p>
+    </details>
+    <details class="surface p-6">
+      <summary class="flex items-center justify-between gap-4 font-semibold text-[17.5px]">How real is the "missed jobs" number?<svg class="chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <p class="mt-3 text-[15.5px]">We combine your local search volume, current visibility, and your top three competitors' review counts. Customers usually hit the forecast within ±15%.</p>
+    </details>
+    <details class="surface p-6">
+      <summary class="flex items-center justify-between gap-4 font-semibold text-[17.5px]">I'm not technical — will I actually understand this?<svg class="chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <p class="mt-3 text-[15.5px]">Yes. No "H1 tags", no "backlinks", no crawl reports. Just things like "Your hours are wrong on Saturday" or "You're missing 'water heater repair' on your service list".</p>
+    </details>
+    <details class="surface p-6">
+      <summary class="flex items-center justify-between gap-4 font-semibold text-[17.5px]">How fast will I see more calls?<svg class="chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <p class="mt-3 text-[15.5px]">Quick wins (hours, categories, services) usually move your map rank within 7–14 days. Reviews and ZIP pages ramp over 30–60 days.</p>
+    </details>
+    <details class="surface p-6">
+      <summary class="flex items-center justify-between gap-4 font-semibold text-[17.5px]">How is this different from SEMrush or Ahrefs?<svg class="chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <p class="mt-3 text-[15.5px]">Those tools ship hundreds of charts for marketing agencies. LeadRadar is built for a pro with five minutes between jobs. Same intelligence, none of the noise, and we actually do the fixes.</p>
+    </details>
+    <details class="surface p-6">
+      <summary class="flex items-center justify-between gap-4 font-semibold text-[17.5px]">How fresh is the data?<svg class="chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <p class="mt-3 text-[15.5px]">Every scan runs live. Google Business signals, Yelp ratings, competitor reviews — under 24 hours old, every time. No cached reports, no "pending" badges that never finish.</p>
+    </details>
+    <details class="surface p-6">
+      <summary class="flex items-center justify-between gap-4 font-semibold text-[17.5px]">How do I cancel?<svg class="chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <p class="mt-3 text-[15.5px]">Settings → Cancel. Two taps. Done in under 10 seconds. No phone call, no retention form, no "are you sure" guilt page. If you cancel within 60 days we refund the whole period.</p>
+    </details>
+    <details class="surface p-6">
+      <summary class="flex items-center justify-between gap-4 font-semibold text-[17.5px]">Are there hidden fees or overages?<svg class="chev" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+      <p class="mt-3 text-[15.5px]">No. One flat monthly price. No per-scan credits, no setup fee, no "premium add-on" catches. You get one price, one invoice, one button to cancel.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ============= FINAL CTA ============= -->
+<section aria-labelledby="final-cta" class="max-w-5xl mx-auto px-5 md:px-6 pb-20">
+  <div class="p-8 md:p-14 text-center" style="background:var(--ink);color:var(--bg);border-radius:var(--radius-lg)">
+    <h2 id="final-cta" class="text-[clamp(2rem,6vw,3.2rem)]" style="color:var(--bg)">Every day without a scan is calls going to someone else.</h2>
+    <p class="mt-4 text-[17px]" style="color:color-mix(in srgb,var(--bg) 72%,transparent)">Free. 60 seconds. No card.</p>
+    <a href="#scan" class="btn btn-primary mt-7">Scan my business now</a>
+  </div>
+</section>
+</main>
+
+<!-- ============= FOOTER ============= -->
+<footer class="border-t line">
+  <div class="max-w-5xl mx-auto px-5 md:px-6 py-10 flex flex-col md:flex-row justify-between gap-6">
+    <div>
+      <div class="flex items-center gap-2.5">
+        <span aria-hidden="true" class="w-7 h-7 rounded-full" style="background:var(--brand)"></span>
+        <span class="font-extrabold tracking-tight">LeadRadar</span>
+      </div>
+      <p class="muted text-[14px] mt-3 max-w-xs">Local-lead intelligence for service pros. Made in the US.</p>
+    </div>
+    <nav aria-label="Footer" class="flex gap-10 text-[14.5px]">
+      <div>
+        <p class="muted text-[12px] uppercase tracking-[0.15em] mb-3">Product</p>
+        <ul class="space-y-2">
+          <li><a href="#fixes" class="hover:underline">What we fix</a></li>
+          <li><a href="#pricing" class="hover:underline">Pricing</a></li>
+          <li><a href="#faq" class="hover:underline">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="muted text-[12px] uppercase tracking-[0.15em] mb-3">Company</p>
+        <ul class="space-y-2">
+          <li><a href="#" class="hover:underline">Contact</a></li>
+          <li><a href="#" class="hover:underline">Privacy</a></li>
+          <li><a href="#" class="hover:underline">Terms</a></li>
+          <li><a href="/api/logout" class="hover:underline">Log out</a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+  <div class="border-t line">
+    <div class="max-w-5xl mx-auto px-5 md:px-6 py-5 text-[12.5px] muted flex justify-between flex-wrap gap-3 items-center">
+      <span>© 2026 LeadRadar, Inc. · Made in the US</span>
+      <span class="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span>SOC 2 in progress</span>
+        <span aria-hidden="true">·</span>
+        <span>256-bit SSL</span>
+        <span aria-hidden="true">·</span>
+        <span>Google OAuth read-only</span>
+        <span aria-hidden="true">·</span>
+        <span>AI drafts labeled, humans approve</span>
+      </span>
+    </div>
+    <div class="max-w-5xl mx-auto px-5 md:px-6 pb-5 text-[11.5px] muted">Not affiliated with Google, Yelp, SEMrush, Ahrefs, BrightLocal, Podium, BirdEye, or Thryv. Their marks belong to their owners.</div>
+  </div>
+</footer>
+
+<!-- ============= DEMO LOGIC ============= -->
+<script>
+(() => {
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const form = document.getElementById('scanForm');
+  const urlInput = document.getElementById('urlInput');
+  const overlay = document.getElementById('scanOverlay');
+  const steps = Array.from(document.querySelectorAll('#scanSteps .step'));
+  const results = document.getElementById('results');
+  const scanDomainEl = document.getElementById('scanDomain');
+  const domainLabel = document.getElementById('domainLabel');
+  const categoryLabel = document.getElementById('categoryLabel');
+  const areaLabel = document.getElementById('areaLabel');
+  const scoreDial = document.getElementById('scoreDial');
+  const scoreNum = document.getElementById('scoreNum');
+  const scoreLabel = document.getElementById('scoreLabel');
+  const missedLeads = document.getElementById('missedLeads');
+  const revLoss = document.getElementById('revLoss');
+  const leadsRecap = document.getElementById('leadsRecap');
+  const compBars = document.getElementById('compBars');
+  const issuesGrid = document.getElementById('issuesGrid');
+  const issueMeta = document.getElementById('issueMeta');
+
+  function fnv(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h>>>0}
+  function lcg(seed){return function(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}}
+
+  function detectVertical(d){
+    const s=d.toLowerCase();
+    if(/plumb|drain|water/.test(s)) return {name:'Plumbing', jobVal:420, keyword:'emergency plumber near me'};
+    if(/hvac|heat|cool|ac\b|furnace/.test(s)) return {name:'HVAC', jobVal:610, keyword:'AC repair near me'};
+    if(/electri/.test(s)) return {name:'Electrical', jobVal:380, keyword:'electrician near me'};
+    if(/lock/.test(s)) return {name:'Locksmith', jobVal:185, keyword:'24-hour locksmith'};
+    if(/garage/.test(s)) return {name:'Garage door', jobVal:320, keyword:'garage door repair'};
+    if(/appliance/.test(s)) return {name:'Appliance repair', jobVal:245, keyword:'appliance repair near me'};
+    if(/roof/.test(s)) return {name:'Roofing', jobVal:1400, keyword:'roof leak repair'};
+    if(/handy/.test(s)) return {name:'Handyman', jobVal:210, keyword:'handyman near me'};
+    return {name:'Home services', jobVal:360, keyword:'service near me'};
+  }
+
+  function normalizeDomain(v){
+    let d=(v||'').trim();
+    d=d.replace(/^https?:\/\//i,'').replace(/^www\./i,'').split('/')[0];
+    if(!d.includes('.')) d+='.com';
+    return d.toLowerCase();
+  }
+
+  function setDial(score){
+    let c;
+    if(score<40) c='var(--accent)';
+    else if(score<65) c='#D97706';
+    else c='var(--brand)';
+    scoreDial.style.setProperty('--c',c);
+    scoreLabel.style.color=c;
+    if(prefersReduced){
+      scoreDial.style.setProperty('--v',score);
+      scoreNum.textContent=score;
+      return;
+    }
+    let v=0;
+    const t=setInterval(()=>{v+=2;if(v>=score){v=score;clearInterval(t)}scoreDial.style.setProperty('--v',v);scoreNum.textContent=v;},18);
+    scoreLabel.textContent = score<40?'At risk':score<65?'Leaking leads':score<80?'Above average':'Strong';
+  }
+
+  function countUp(el, from, to, dur, fmt){
+    if(!fmt) fmt = function(n){ return n; };
+    if(!dur) dur = 1300;
+    if(prefersReduced){el.textContent=fmt(to);return}
+    const start=performance.now();
+    function step(t){
+      const p=Math.min(1,(t-start)/dur);
+      const e=1-Math.pow(1-p,3);
+      el.textContent=fmt(Math.round(from+(to-from)*e));
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function runScan(raw){
+    const domain = normalizeDomain(raw);
+    const seed = fnv(domain);
+    const R = lcg(seed);
+    const vert = detectVertical(domain);
+
+    steps.forEach(function(s){s.classList.remove('done','active');s.querySelector('.bar i').style.width='0%';});
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-busy','true');
+    results.setAttribute('aria-busy','true');
+    scanDomainEl.textContent = domain;
+
+    const timings = prefersReduced ? [80,80,80,80,80] : [720,780,820,760,900];
+    let idx=0;
+    function runStep(){
+      if(idx>=steps.length){
+        setTimeout(function(){overlay.classList.remove('active');overlay.setAttribute('aria-busy','false');revealResults(domain,vert,R)},240);
+        return;
+      }
+      const s=steps[idx];
+      s.classList.add('active');
+      const bar=s.querySelector('.bar i');
+      bar.style.transition='width '+timings[idx]+'ms linear';
+      requestAnimationFrame(function(){bar.style.width='100%'});
+      setTimeout(function(){s.classList.remove('active');s.classList.add('done');idx++;runStep();}, timings[idx]);
+    }
+    runStep();
+  }
+
+  function revealResults(domain, vert, R){
+    const base = 28 + Math.floor(R()*45);
+    const score = Math.min(78, Math.max(22, base));
+    const missed = Math.round(12 + R()*36);
+    const rev = missed * vert.jobVal;
+
+    domainLabel.textContent = domain;
+    categoryLabel.textContent = vert.name;
+    areaLabel.textContent = ['Dallas-Fort Worth','Phoenix Metro','Denver Metro','Tampa Bay','Atlanta','Chicagoland','Seattle Metro'][Math.floor(R()*7)];
+    leadsRecap.textContent = missed;
+
+    setDial(score);
+    countUp(missedLeads, 0, missed, 1400);
+    countUp(revLoss, 0, rev, 1600, function(n){ return n.toLocaleString(); });
+
+    const you = score;
+    const c1 = Math.min(95, you + 8 + Math.floor(R()*14));
+    const c2 = Math.min(95, you + 2 + Math.floor(R()*18));
+    const c3 = Math.max(10, you - 6 + Math.floor(R()*20));
+    const d1 = (0.4 + R()*1.6).toFixed(1);
+    const d2 = (1.5 + R()*2.8).toFixed(1);
+    const d3 = (3.1 + R()*4.4).toFixed(1);
+    compBars.innerHTML='';
+    const rows=[
+      {name:'You · '+domain, val:you, color:'var(--accent)'},
+      {name:'Nearest same-trade · '+d1+' mi', val:c1, color:'var(--brand)'},
+      {name:'Top-rated in ZIP · '+d2+' mi',  val:c2, color:'var(--brand)'},
+      {name:'Newest in market · '+d3+' mi',  val:c3, color:'var(--brand)'}
+    ];
+    rows.sort(function(a,b){return b.val-a.val});
+    rows.forEach(function(r){
+      const row=document.createElement('div');
+      row.className='row';
+      row.innerHTML =
+        '<div class="text-[15px] font-semibold truncate">'+r.name+'</div>' +
+        '<div class="barbg" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+r.val+'"><i style="background:'+r.color+'"></i></div>' +
+        '<div class="tnum text-[15px] font-extrabold w-10 text-right">'+r.val+'</div>';
+      compBars.appendChild(row);
+      if(prefersReduced){row.querySelector('i').style.width=r.val+'%'}
+      else{requestAnimationFrame(function(){row.querySelector('i').style.width=r.val+'%'});}
+    });
+    const noteRow = document.createElement('p');
+    noteRow.className = 'text-[12.5px] muted mt-1';
+    noteRow.textContent = 'Competitor identities masked in preview. Full names unlocked on any paid plan.';
+    compBars.appendChild(noteRow);
+
+    const pool = [
+      {sev:'sev-hi', title:'Google Business hours wrong on Saturdays', impact:Math.round(missed*0.22)*vert.jobVal, why:'You show "closed" Saturday — your top competitor shows "Open 24h". The map pack rewards availability.'},
+      {sev:'sev-hi', title:'Missing primary service: "'+vert.keyword+'"', impact:Math.round(missed*0.18)*vert.jobVal, why:'Your service list is missing the #1 "near me" search in your ZIP.'},
+      {sev:'sev-hi', title:'Review gap vs competitors (–'+(180+Math.floor(R()*140))+' reviews)', impact:Math.round(missed*0.20)*vert.jobVal, why:'Customers filter by 4.5★+ and 100+ reviews. You\'re not making the short list.'},
+      {sev:'sev-md', title:'No ZIP landing pages — only the home page ranks', impact:Math.round(missed*0.14)*vert.jobVal, why:'Google ranks per-city pages. One page = one city that finds you.'},
+      {sev:'sev-md', title:'Website loads in 6.2s on phone', impact:Math.round(missed*0.09)*vert.jobVal, why:'Half your visitors bounce before the page loads. Free fix.'},
+      {sev:'sev-lo', title:'Phone number not click-to-call on mobile', impact:Math.round(missed*0.06)*vert.jobVal, why:'Nine out of ten service visits are mobile. One tap to call beats typing.'}
+    ];
+
+    issuesGrid.innerHTML='';
+    pool.forEach(function(issue,i){
+      const locked = i>=2;
+      const sevLabel = issue.sev==='sev-hi'?'High impact':issue.sev==='sev-md'?'Medium':'Low';
+      const card = document.createElement('article');
+      card.setAttribute('role','listitem');
+      card.className = 'surface p-6 ' + (locked?'locked':'');
+      card.innerHTML =
+        '<div class="'+(locked?'blurred':'')+'">' +
+          '<div class="flex items-center justify-between gap-3">' +
+            '<span class="text-[11.5px] font-bold px-2.5 py-1 rounded-full '+issue.sev+'" style="letter-spacing:0.05em">'+sevLabel.toUpperCase()+'</span>' +
+            '<span class="text-[15px] font-extrabold accent tnum">$'+issue.impact.toLocaleString()+'/mo</span>' +
+          '</div>' +
+          '<h3 class="mt-3 text-[19px]" style="line-height:1.25">'+issue.title+'</h3>' +
+          '<p class="mt-2 text-[15px]">'+issue.why+'</p>' +
+          '<div class="mt-5"><a href="#pricing" class="btn btn-ghost btn-sm">Fix this</a></div>' +
+        '</div>' +
+        (locked ?
+          '<div class="veil">' +
+            '<div class="flex items-center gap-2 font-extrabold" style="color:var(--ink)">' +
+              '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
+              ' Locked' +
+            '</div>' +
+            '<p class="text-[14.5px] muted">Unlock all 6 fixes and the step-by-step plan.</p>' +
+            '<a href="#pricing" class="btn btn-primary btn-sm">Unlock fixes</a>' +
+          '</div>' : '');
+      issuesGrid.appendChild(card);
+    });
+    issueMeta.textContent = '2 shown · 4 locked';
+
+    results.classList.add('show');
+    results.setAttribute('aria-busy','false');
+    setTimeout(function(){results.scrollIntoView({behavior:prefersReduced?'auto':'smooth',block:'start'})},60);
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!urlInput.value.trim()){urlInput.focus();return;}
+    runScan(urlInput.value);
+  });
+
+  const pdfForm = document.getElementById('pdfForm');
+  const pdfEmail = document.getElementById('pdfEmail');
+  const pdfConfirm = document.getElementById('pdfConfirm');
+  if (pdfForm) {
+    pdfForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      const val = (pdfEmail.value || '').trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) { pdfEmail.focus(); return; }
+      pdfForm.style.display = 'none';
+      pdfConfirm.style.display = 'block';
+    });
+  }
+
+  const liveScansEl = document.getElementById('liveScans');
+  const liveRecentEl = document.getElementById('liveRecent');
+  if (liveScansEl) {
+    const epochStart = new Date('2026-04-14T00:00:00Z').getTime();
+    const now = Date.now();
+    const hoursSince = Math.max(0, (now - epochStart) / 36e5);
+    const base = 240 + Math.floor(hoursSince * 4.25);
+    liveScansEl.textContent = base.toLocaleString();
+  }
+  if (liveRecentEl) {
+    const pool = [
+      'Plumbing, Tulsa OK',
+      'HVAC, Phoenix AZ',
+      'Garage door, Austin TX',
+      'Electrical, Tampa FL',
+      'Locksmith, Denver CO',
+      'Handyman, Raleigh NC',
+      'Appliance, Seattle WA',
+      'Roofing, Atlanta GA'
+    ];
+    const mins = [2, 4, 7, 9, 12, 15, 19, 23];
+    const idx = Math.floor(Date.now() / 120000) % pool.length;
+    liveRecentEl.textContent = pool[idx] + ' · ' + mins[idx] + ' min ago';
+  }
+})();
+</script>
