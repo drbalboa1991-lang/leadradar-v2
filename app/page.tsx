@@ -1,5 +1,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import WaitlistForm from './_components/WaitlistForm';
 
 /**
  * Home (protected) route.
@@ -29,5 +30,24 @@ async function getLandingHtml(): Promise<string> {
 
 export default async function HomePage() {
   const html = await getLandingHtml();
-  return <div dangerouslySetInnerHTML={{ __html: html }} />;
+  // Inline scripts in the injected HTML mutate the DOM during parse, so the
+  // post-script DOM no longer matches React's SSR tree. We render the HTML
+  // verbatim and opt out of hydration reconciliation for this subtree.
+  return (
+    <>
+      <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />
+      <section
+        className="max-w-5xl mx-auto px-5 md:px-6 py-16 text-center border-t"
+        style={{ borderColor: 'var(--line)' }}
+      >
+        <h2 className="text-2xl font-extrabold tracking-tight mb-2" style={{ color: 'var(--ink)' }}>
+          Get early access
+        </h2>
+        <p className="text-sm mb-6" style={{ color: 'var(--muted, #6b7280)' }}>
+          Be first to know when LeadRadar opens to the public.
+        </p>
+        <WaitlistForm />
+      </section>
+    </>
+  );
 }
