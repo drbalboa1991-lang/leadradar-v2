@@ -1,6 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import WaitlistForm from './_components/WaitlistForm';
+import ScanForm from './_components/ScanForm';
 
 /**
  * Home (protected) route.
@@ -35,6 +36,19 @@ export default async function HomePage() {
   // verbatim and opt out of hydration reconciliation for this subtree.
   return (
     <>
+      {/* Scan section — above landing content so it's the first thing logged-in users see */}
+      <section
+        className="max-w-5xl mx-auto px-5 md:px-6 pt-14 pb-12 text-center"
+      >
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3" style={{ color: 'var(--ink)' }}>
+          See the customers your website is losing
+        </h1>
+        <p className="text-base mb-8" style={{ color: 'var(--muted, #6b7280)' }}>
+          Paste your URL. Get your score in 10 seconds.
+        </p>
+        <ScanForm />
+      </section>
+
       <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />
       <section
         className="max-w-5xl mx-auto px-5 md:px-6 py-16 text-center border-t"
