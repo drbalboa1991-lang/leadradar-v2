@@ -13,9 +13,10 @@
 
 import type { ScanResult } from '@/lib/scan';
 
-// ── Stripe payment URLs (replace with real links) ─────────────────────────
-const STRIPE_ONETIME = '#'; // TODO: replace with Stripe one-time $9.99 link
-const STRIPE_MONTHLY = '#'; // TODO: replace with Stripe $29/mo link
+// ── Stripe payment URLs ───────────────────────────────────────────────────
+// Test-mode links — swap for live links before going to production
+const STRIPE_ONETIME = 'https://buy.stripe.com/test_3cIdR96948zH3dT5AP6AM00';
+const STRIPE_MONTHLY = 'https://buy.stripe.com/test_5kQ9AT1SO17f7u9d3h6AM01';
 
 // ── Helper calculations ───────────────────────────────────────────────────
 
