@@ -45,11 +45,7 @@ export async function POST(request: Request) {
       console.error('[scan] failed to save result:', saveErr);
     }
 
-    // ── Strip proChecks — only returned to paid users via GET /api/scan/[id] ──
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { proChecks: _stripped, ...publicResult } = result;
-
-    return NextResponse.json({ ok: true, data: { ...publicResult, proChecks: [] }, shareId });
+    return NextResponse.json({ ok: true, data: result, shareId });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : '';
     if (msg.includes('abort') || msg.includes('timeout')) {

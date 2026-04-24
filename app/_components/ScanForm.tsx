@@ -16,30 +16,14 @@ export default function ScanForm() {
   const [error,   setError]   = useState('');
   const [copied,  setCopied]  = useState(false);
 
-  // Listen for postMessage from the Stripe thank-you tab.
-  // When payment succeeds, fetch the now-unlocked proChecks from the server
-  // and merge them into the result so PremiumUpsell can render real data.
+  // Listen for postMessage from the Stripe thank-you tab — verify origin to prevent spoofing
   useEffect(() => {
-    async function onMessage(e: MessageEvent) {
+    function onMessage(e: MessageEvent) {
       if (e.origin !== window.location.origin) return; // reject cross-origin messages
-      if (e.data?.type !== 'PAYMENT_SUCCESS') return;
-      if (e.data?.scanId !== shareId) return;
-
-      // Fetch the real proChecks — only served to paid scans
-      try {
-        const res  = await fetch(`/api/scan/${e.data.scanId}`);
-        const data = await res.json();
-        if (data.ok && Array.isArray(data.proChecks)) {
-          setResult(prev => prev ? { ...prev, proChecks: data.proChecks } : prev);
-        }
-      } catch {
-        // Network hiccup — still flip paid so the UI unlocks; proChecks
-        // may already be embedded in the stored result on the share page.
+      if (e.data?.type === 'PAYMENT_SUCCESS' && e.data?.scanId === shareId) {
+        setPaid(true);
       }
-
-      setPaid(true);
     }
-
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
   }, [shareId]);
