@@ -45,8 +45,8 @@ export default function ThankYouPage() {
           </p>
           {[
             { icon: '📊', text: 'Your full report is being prepared' },
-            { icon: '📬', text: 'Check your email for your receipt from Stripe' },
-            { icon: '🚀', text: 'Full pro features are now unlocked on your account' },
+            { icon: '📬', text: 'Check your email — Stripe sent you a receipt' },
+            { icon: '🚀', text: 'Close this tab and go back to your scan to see it' },
           ].map(({ icon, text }) => (
             <div key={text} className="flex items-start gap-3">
               <span className="text-lg shrink-0">{icon}</span>
@@ -64,7 +64,7 @@ export default function ThankYouPage() {
             className="block w-full px-6 py-3 rounded-xl text-sm font-bold text-center transition-opacity hover:opacity-90"
             style={{ background: 'var(--brand)', color: 'var(--brand-ink)' }}
           >
-            Back to LeadRadar →
+            Go to LeadRadar →
           </Link>
           <p className="text-xs" style={{ color: 'var(--muted, #6b7280)' }}>
             Questions? Email us at{' '}

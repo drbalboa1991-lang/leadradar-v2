@@ -278,6 +278,8 @@ export default function PremiumUpsell({ result }: { result: ScanResult }) {
           {/* One-time */}
           <a
             href={STRIPE_ONETIME}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex-1 flex flex-col items-center gap-1 px-4 py-4 rounded-xl border transition-opacity hover:opacity-90"
             style={{
               borderColor: 'var(--line)',
@@ -298,6 +300,8 @@ export default function PremiumUpsell({ result }: { result: ScanResult }) {
           {/* Monthly — highlighted */}
           <a
             href={STRIPE_MONTHLY}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex-1 flex flex-col items-center gap-1 px-4 py-4 rounded-xl transition-opacity hover:opacity-90"
             style={{ background: 'var(--brand)', color: 'var(--brand-ink)' }}
           >
