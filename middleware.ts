@@ -42,10 +42,11 @@ function redirectToLogin(req: NextRequest, reason?: string) {
  * Match every request except:
  *  - /login  (the public gate itself)
  *  - /api/login & /api/logout (auth endpoints)
+ *  - /scan/[id]  (public shareable scan reports — no auth required)
  *  - Next.js internals and static assets
  */
 export const config = {
   matcher: [
-    '/((?!login|api/login|api/logout|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
+    '/((?!login|scan/|api/login|api/logout|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
   ],
 };

@@ -2,28 +2,25 @@
 
 import { useState } from 'react';
 import type { ScanResult } from '@/lib/scan';
+import ScanResultCard from './ScanResultCard';
 
 type Status = 'idle' | 'scanning' | 'done' | 'error';
-
-const GRADE_COLOR: Record<string, string> = {
-  A: '#22c55e',
-  B: '#84cc16',
-  C: '#f59e0b',
-  D: '#f97316',
-  F: '#ef4444',
-};
 
 export default function ScanForm() {
   const [url, setUrl] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [result, setResult] = useState<ScanResult | null>(null);
+  const [shareId, setShareId] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const [copied, setCopied] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus('scanning');
     setResult(null);
+    setShareId(null);
     setError('');
+    setCopied(false);
 
     try {
       const res = await fetch('/api/scan', {
@@ -38,6 +35,7 @@ export default function ScanForm() {
         return;
       }
       setResult(data.data);
+      setShareId(data.shareId ?? null);
       setStatus('done');
     } catch {
       setError('Network error. Please try again.');
@@ -45,7 +43,19 @@ export default function ScanForm() {
     }
   }
 
-  const failed = result?.checks.filter(c => !c.passed) ?? [];
+  function buildShareUrl(): string {
+    return `${window.location.origin}/scan/${shareId}`;
+  }
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(buildShareUrl());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback: select the text in the input
+    }
+  }
 
   return (
     <div className="w-full max-w-2xl mx-auto">
@@ -59,7 +69,11 @@ export default function ScanForm() {
           required
           disabled={status === 'scanning'}
           className="flex-1 px-4 py-3 rounded-lg border text-sm"
-          style={{ background: 'color-mix(in srgb,var(--bg) 80%,transparent)', borderColor: 'var(--line)', color: 'var(--ink)' }}
+          style={{
+            background: 'color-mix(in srgb,var(--bg) 80%,transparent)',
+            borderColor: 'var(--line)',
+            color: 'var(--ink)',
+          }}
         />
         <button
           type="submit"
@@ -80,60 +94,62 @@ export default function ScanForm() {
 
       {/* Error */}
       {status === 'error' && (
-        <p className="mt-4 text-sm text-center" style={{ color: '#ef4444' }}>{error}</p>
+        <p className="mt-4 text-sm text-center" style={{ color: '#ef4444' }}>
+          {error}
+        </p>
       )}
 
       {/* Results */}
       {status === 'done' && result && (
         <div className="mt-8 space-y-6">
-          {/* Score header */}
-          <div className="flex items-center gap-6 p-6 rounded-2xl border" style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb,var(--bg) 90%,transparent)' }}>
-            <div className="text-center shrink-0">
-              <div className="text-6xl font-black" style={{ color: GRADE_COLOR[result.grade] }}>{result.grade}</div>
-              <div className="text-sm font-semibold mt-1" style={{ color: 'var(--ink)' }}>{result.score}/{result.maxScore} pts</div>
-            </div>
-            <div>
-              <p className="font-bold text-lg" style={{ color: 'var(--ink)' }}>
-                You're missing ~<span style={{ color: '#ef4444' }}>{result.missedLeadsPerMonth} leads/month</span>
-              </p>
-              <p className="text-sm mt-1" style={{ color: 'var(--muted, #6b7280)' }}>
-                {result.url}
-              </p>
-              {failed.length === 0 ? (
-                <p className="text-sm mt-2" style={{ color: '#22c55e' }}>🎉 Perfect score! Your site is fully optimized.</p>
-              ) : (
-                <p className="text-sm mt-2" style={{ color: 'var(--muted, #6b7280)' }}>
-                  Fix the {failed.length} issue{failed.length !== 1 ? 's' : ''} below to capture more customers.
-                </p>
-              )}
-            </div>
-          </div>
+          <ScanResultCard result={result} />
 
-          {/* Checklist */}
-          <div className="space-y-3">
-            {result.checks.map(check => (
-              <div
-                key={check.id}
-                className="flex items-start gap-3 p-4 rounded-xl border"
-                style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb,var(--bg) 95%,transparent)' }}
+          {/* Share URL */}
+          {shareId && (
+            <div
+              className="p-4 rounded-xl border"
+              style={{
+                borderColor: 'var(--line)',
+                background: 'color-mix(in srgb,var(--bg) 90%,transparent)',
+              }}
+            >
+              <p
+                className="text-xs font-semibold mb-2"
+                style={{ color: 'var(--ink)' }}
               >
-                <span className="text-lg shrink-0 mt-0.5">{check.passed ? '✅' : '❌'}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>{check.name}</span>
-                    <span className="text-xs shrink-0" style={{ color: 'var(--muted, #6b7280)' }}>{check.weight} pts</span>
-                  </div>
-                  {!check.passed && (
-                    <p className="text-xs mt-1" style={{ color: 'var(--muted, #6b7280)' }}>{check.tip}</p>
-                  )}
-                </div>
+                Share this report
+              </p>
+              <div className="flex items-center gap-2">
+                <code
+                  className="flex-1 text-xs break-all"
+                  style={{ color: 'var(--muted, #6b7280)' }}
+                >
+                  {buildShareUrl()}
+                </code>
+                <button
+                  onClick={handleCopy}
+                  className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                  style={{
+                    background: copied
+                      ? 'color-mix(in srgb,var(--brand) 15%,transparent)'
+                      : 'color-mix(in srgb,var(--line) 60%,transparent)',
+                    color: copied ? 'var(--brand)' : 'var(--ink)',
+                  }}
+                >
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
 
           {/* Scan again */}
           <button
-            onClick={() => { setStatus('idle'); setResult(null); setUrl(''); }}
+            onClick={() => {
+              setStatus('idle');
+              setResult(null);
+              setShareId(null);
+              setUrl('');
+            }}
             className="text-sm underline"
             style={{ color: 'var(--muted, #6b7280)' }}
           >

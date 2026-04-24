@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { scanWebsite } from '@/lib/scan';
+import { saveScan } from '@/lib/scanStore';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30; // Vercel: up to 30s for scan
@@ -19,7 +20,17 @@ export async function POST(request: Request) {
     }
 
     const result = await scanWebsite(raw);
-    return NextResponse.json({ ok: true, data: result });
+
+    // Persist the result so it can be shared via /scan/[id].
+    // Non-fatal: if storage fails the scan result is still returned.
+    let shareId: string | undefined;
+    try {
+      shareId = await saveScan(result);
+    } catch (saveErr) {
+      console.error('[scan] failed to save result:', saveErr);
+    }
+
+    return NextResponse.json({ ok: true, data: result, shareId });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
     if (msg.includes('abort') || msg.includes('timeout')) {
