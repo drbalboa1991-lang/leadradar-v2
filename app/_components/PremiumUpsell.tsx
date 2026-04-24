@@ -252,13 +252,13 @@ export default function PremiumUpsell({ result, scanId, paid }: Props) {
         </div>
       </LockedCard>
 
-      <LockedCard icon="✨" title={`Pro Deep Scan (+${proChecks.length} advanced checks)`}
+      <LockedCard icon="✨" title="Pro Deep Scan (+6 advanced checks)"
         subtitle="Live chat, reviews, video, FAQ, financing, guarantee">
         <div className="space-y-1">
-          {proChecks.slice(0, 4).map(c => (
-            <div key={c.id} className="flex items-center gap-2">
+          {['Live chat widget', 'Customer reviews on-site', 'Video content', 'FAQ section'].map(name => (
+            <div key={name} className="flex items-center gap-2">
               <span className="text-xs">⬜</span>
-              <span className="text-xs">{c.name}</span>
+              <span className="text-xs">{name}</span>
             </div>
           ))}
         </div>
@@ -270,7 +270,7 @@ export default function PremiumUpsell({ result, scanId, paid }: Props) {
         <div>
           <p className="font-extrabold text-lg" style={{ color: 'var(--ink)' }}>Unlock your full pro report</p>
           <p className="text-sm mt-1" style={{ color: 'var(--muted, #6b7280)' }}>
-            Benchmark vs. industry · revenue calculator · {proChecks.length} deep checks
+            Benchmark vs. industry · revenue calculator · 6 deep checks
           </p>
         </div>
 
