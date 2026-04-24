@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { ScanResult } from '@/lib/scan';
 import ScanResultCard from './ScanResultCard';
+import PremiumUpsell from './PremiumUpsell';
 
 type Status = 'idle' | 'scanning' | 'done' | 'error';
 
@@ -103,6 +104,9 @@ export default function ScanForm() {
       {status === 'done' && result && (
         <div className="mt-8 space-y-6">
           <ScanResultCard result={result} />
+
+          {/* Premium upsell — blurred locked sections */}
+          <PremiumUpsell result={result} />
 
           {/* Share URL */}
           {shareId && (
