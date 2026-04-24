@@ -16,9 +16,10 @@ export default function ScanForm() {
   const [error,   setError]   = useState('');
   const [copied,  setCopied]  = useState(false);
 
-  // Listen for postMessage from the Stripe thank-you tab
+  // Listen for postMessage from the Stripe thank-you tab — verify origin to prevent spoofing
   useEffect(() => {
     function onMessage(e: MessageEvent) {
+      if (e.origin !== window.location.origin) return; // reject cross-origin messages
       if (e.data?.type === 'PAYMENT_SUCCESS' && e.data?.scanId === shareId) {
         setPaid(true);
       }

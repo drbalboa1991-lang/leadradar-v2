@@ -10,16 +10,18 @@ function ThankYouContent() {
 
   // As soon as this page loads, postMessage to the opener tab
   // so ScanForm can flip to "paid" state immediately.
+  const appOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+
   useEffect(() => {
     if (scanId && window.opener) {
-      window.opener.postMessage({ type: 'PAYMENT_SUCCESS', scanId }, '*');
+      window.opener.postMessage({ type: 'PAYMENT_SUCCESS', scanId }, appOrigin);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanId]);
 
   function handleClose() {
-    // postMessage again in case opener wasn't ready on load
     if (scanId && window.opener) {
-      window.opener.postMessage({ type: 'PAYMENT_SUCCESS', scanId }, '*');
+      window.opener.postMessage({ type: 'PAYMENT_SUCCESS', scanId }, appOrigin);
     }
     window.close();
     // Fallback if window.close() is blocked
@@ -80,7 +82,11 @@ function ThankYouContent() {
 
 export default function ThankYouPage() {
   return (
-    <Suspense>
+    <Suspense fallback={
+      <main className="min-h-screen flex items-center justify-center">
+        <p className="text-sm" style={{ color: 'var(--muted, #6b7280)' }}>Loading your confirmation…</p>
+      </main>
+    }>
       <ThankYouContent />
     </Suspense>
   );

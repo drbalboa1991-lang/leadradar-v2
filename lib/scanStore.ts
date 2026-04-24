@@ -89,6 +89,12 @@ function getSqliteDb(): Database {
       created_at INTEGER NOT NULL
     )
   `);
+  // Migrate: add paid_at column to databases created before this version
+  try {
+    sqliteDb.exec(`ALTER TABLE scans ADD COLUMN paid_at INTEGER`);
+  } catch {
+    // Column already exists — ignore
+  }
   return sqliteDb;
 }
 

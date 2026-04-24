@@ -20,8 +20,9 @@ export interface ScanResult {
 
 // ── Free-tier check regexes ────────────────────────────────────────────────
 const PHONE_RE   = /(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
-const EMAIL_RE   = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
-const HOURS_RE   = /\b(mon|tue|wed|thu|fri|sat|sun|monday|tuesday|wednesday|thursday|friday|saturday|sunday|open|closed|hours|am|pm)\b/i;
+const EMAIL_RE   = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i; // no `g` — stateful lastIndex breaks .test()
+// Requires a day-name near a time (8am / 9:00) OR an explicit "hours" phrase
+const HOURS_RE   = /\b(mon|tue|wed|thu|fri|sat|sun|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b[\s\S]{0,120}\b(\d{1,2}(:\d{2})?\s*(am|pm)|\d{1,2}:\d{2})\b|\b(business hours|opening hours|hours of operation|store hours|we.re open|we are open|open daily|open 24)\b/i;
 const CTA_RE     = /\b(call|contact|get a quote|free estimate|book|schedule|request|hire|get started|click here)\b/i;
 const SOCIAL_RE  = /facebook\.com|instagram\.com|twitter\.com|x\.com|linkedin\.com|yelp\.com|nextdoor\.com/i;
 const ADDRESS_RE = /\b\d{2,5}\s+\w+\s+(st|street|ave|avenue|blvd|boulevard|rd|road|dr|drive|ln|lane|way|ct|court|pl|place)\b/i;
