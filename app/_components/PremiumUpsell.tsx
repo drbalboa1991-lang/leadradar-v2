@@ -15,8 +15,8 @@ import type { ScanResult } from '@/lib/scan';
 
 // ── Stripe payment URLs ───────────────────────────────────────────────────
 // Test-mode links — swap for live links before going to production
-const STRIPE_ONETIME = 'https://buy.stripe.com/test_3cIdR96948zH3dT5AP6AM00';
-const STRIPE_MONTHLY = 'https://buy.stripe.com/test_5kQ9AT1SO17f7u9d3h6AM01';
+const STRIPE_ONETIME = 'https://buy.stripe.com/test_7sY7sLeFA5nv6q58N16AM02';
+const STRIPE_MONTHLY = 'https://buy.stripe.com/test_5kQaEXapkaHP29P2oD6AM03';
 
 // ── Helper calculations ───────────────────────────────────────────────────
 
