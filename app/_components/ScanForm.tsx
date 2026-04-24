@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ScanResult } from '@/lib/scan';
 import ScanResultCard from './ScanResultCard';
 import PremiumUpsell from './PremiumUpsell';
@@ -8,23 +8,36 @@ import PremiumUpsell from './PremiumUpsell';
 type Status = 'idle' | 'scanning' | 'done' | 'error';
 
 export default function ScanForm() {
-  const [url, setUrl] = useState('');
-  const [status, setStatus] = useState<Status>('idle');
-  const [result, setResult] = useState<ScanResult | null>(null);
+  const [url,     setUrl]     = useState('');
+  const [status,  setStatus]  = useState<Status>('idle');
+  const [result,  setResult]  = useState<ScanResult | null>(null);
   const [shareId, setShareId] = useState<string | null>(null);
-  const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [paid,    setPaid]    = useState(false);
+  const [error,   setError]   = useState('');
+  const [copied,  setCopied]  = useState(false);
+
+  // Listen for postMessage from the Stripe thank-you tab
+  useEffect(() => {
+    function onMessage(e: MessageEvent) {
+      if (e.data?.type === 'PAYMENT_SUCCESS' && e.data?.scanId === shareId) {
+        setPaid(true);
+      }
+    }
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [shareId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus('scanning');
     setResult(null);
     setShareId(null);
+    setPaid(false);
     setError('');
     setCopied(false);
 
     try {
-      const res = await fetch('/api/scan', {
+      const res  = await fetch('/api/scan', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ url }),
@@ -44,7 +57,7 @@ export default function ScanForm() {
     }
   }
 
-  function buildShareUrl(): string {
+  function buildShareUrl() {
     return `${window.location.origin}/scan/${shareId}`;
   }
 
@@ -53,9 +66,7 @@ export default function ScanForm() {
       await navigator.clipboard.writeText(buildShareUrl());
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback: select the text in the input
-    }
+    } catch { /* ignore */ }
   }
 
   return (
@@ -70,11 +81,7 @@ export default function ScanForm() {
           required
           disabled={status === 'scanning'}
           className="flex-1 px-4 py-3 rounded-lg border text-sm"
-          style={{
-            background: 'color-mix(in srgb,var(--bg) 80%,transparent)',
-            borderColor: 'var(--line)',
-            color: 'var(--ink)',
-          }}
+          style={{ background: 'color-mix(in srgb,var(--bg) 80%,transparent)', borderColor: 'var(--line)', color: 'var(--ink)' }}
         />
         <button
           type="submit"
@@ -86,57 +93,36 @@ export default function ScanForm() {
         </button>
       </form>
 
-      {/* Scanning indicator */}
       {status === 'scanning' && (
         <p className="mt-4 text-sm text-center" style={{ color: 'var(--ink)' }}>
           Checking your site — this takes about 10 seconds…
         </p>
       )}
 
-      {/* Error */}
       {status === 'error' && (
-        <p className="mt-4 text-sm text-center" style={{ color: '#ef4444' }}>
-          {error}
-        </p>
+        <p className="mt-4 text-sm text-center" style={{ color: '#ef4444' }}>{error}</p>
       )}
 
-      {/* Results */}
       {status === 'done' && result && (
         <div className="mt-8 space-y-6">
           <ScanResultCard result={result} />
 
-          {/* Premium upsell — blurred locked sections */}
-          <PremiumUpsell result={result} />
+          <PremiumUpsell result={result} scanId={shareId} paid={paid} />
 
           {/* Share URL */}
           {shareId && (
-            <div
-              className="p-4 rounded-xl border"
-              style={{
-                borderColor: 'var(--line)',
-                background: 'color-mix(in srgb,var(--bg) 90%,transparent)',
-              }}
-            >
-              <p
-                className="text-xs font-semibold mb-2"
-                style={{ color: 'var(--ink)' }}
-              >
-                Share this report
-              </p>
+            <div className="p-4 rounded-xl border"
+              style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb,var(--bg) 90%,transparent)' }}>
+              <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ink)' }}>Share this report</p>
               <div className="flex items-center gap-2">
-                <code
-                  className="flex-1 text-xs break-all"
-                  style={{ color: 'var(--muted, #6b7280)' }}
-                >
+                <code className="flex-1 text-xs break-all" style={{ color: 'var(--muted, #6b7280)' }}>
                   {buildShareUrl()}
                 </code>
                 <button
                   onClick={handleCopy}
                   className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
                   style={{
-                    background: copied
-                      ? 'color-mix(in srgb,var(--brand) 15%,transparent)'
-                      : 'color-mix(in srgb,var(--line) 60%,transparent)',
+                    background: copied ? 'color-mix(in srgb,var(--brand) 15%,transparent)' : 'color-mix(in srgb,var(--line) 60%,transparent)',
                     color: copied ? 'var(--brand)' : 'var(--ink)',
                   }}
                 >
@@ -146,14 +132,8 @@ export default function ScanForm() {
             </div>
           )}
 
-          {/* Scan again */}
           <button
-            onClick={() => {
-              setStatus('idle');
-              setResult(null);
-              setShareId(null);
-              setUrl('');
-            }}
+            onClick={() => { setStatus('idle'); setResult(null); setShareId(null); setPaid(false); setUrl(''); }}
             className="text-sm underline"
             style={{ color: 'var(--muted, #6b7280)' }}
           >
