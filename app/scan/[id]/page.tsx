@@ -26,6 +26,11 @@ export default async function ScanSharePage({ params }: Props) {
 
   if (!result) notFound();
 
+  // Server-side paywall: never send proChecks data to unauthenticated visitors
+  const safeResult = paid
+    ? result
+    : { ...result, proChecks: [] as typeof result.proChecks };
+
   const scannedDate = new Date(result.scannedAt).toLocaleDateString('en-US', {
     month: 'long', day: 'numeric', year: 'numeric',
   });
@@ -47,10 +52,10 @@ export default async function ScanSharePage({ params }: Props) {
         </p>
       </div>
 
-      <ScanResultCard result={result} />
+      <ScanResultCard result={safeResult} />
 
       {/* Premium section — shows full content if paid, locked if not */}
-      <PremiumUpsell result={result} scanId={id} paid={paid} />
+      <PremiumUpsell result={safeResult} scanId={id} paid={paid} />
 
       <div className="my-10 border-t" style={{ borderColor: 'var(--line)' }} />
 
