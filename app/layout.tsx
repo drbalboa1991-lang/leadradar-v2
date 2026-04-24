@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: 'LeadRadar — See the customers your website is losing. In 60 seconds.',
   description:
     'Plain-English lead scans for plumbers, HVAC, electricians, handymen, locksmiths, appliance and garage-door pros. Paste your URL. See your score, missed jobs per month, and what to fix. Free. 60 seconds.',
-  robots: { index: false, follow: false }, // MVP gate: don't let search engines in yet
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {

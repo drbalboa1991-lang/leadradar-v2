@@ -1,52 +1,19 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { AUTH_COOKIE, expectedToken, safeEqual } from '@/lib/auth';
-
 /**
- * Runs on every request that matches `config.matcher` below. If the request
- * does not carry a valid `lr_auth` cookie, we redirect to /login and preserve
- * the original path in ?from=... so the user lands back where they wanted
- * after a successful login.
+ * Middleware — intentionally a pass-through.
  *
- * Edge runtime is fine here because we only use Web Crypto (via lib/auth).
+ * The password gate has been removed. The app is fully public.
+ * Login/logout routes and auth helpers are kept for a future
+ * admin-only area if needed.
  */
-export async function middleware(req: NextRequest) {
-  const token = req.cookies.get(AUTH_COOKIE)?.value ?? '';
-  const expected = await expectedToken();
 
-  // If the server is missing env vars, send the user to /login so they see a
-  // clear failure instead of a mysterious 500 on every page.
-  if (!expected) {
-    return redirectToLogin(req, 'misconfigured');
-  }
+import { NextResponse } from 'next/server';
 
-  if (!token || !safeEqual(token, expected)) {
-    return redirectToLogin(req);
-  }
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function middleware() {
   return NextResponse.next();
 }
 
-function redirectToLogin(req: NextRequest, reason?: string) {
-  const url = req.nextUrl.clone();
-  url.pathname = '/login';
-  url.search = ''; // wipe existing query params
-  if (req.nextUrl.pathname !== '/') {
-    url.searchParams.set('from', req.nextUrl.pathname + req.nextUrl.search);
-  }
-  if (reason) url.searchParams.set('reason', reason);
-  return NextResponse.redirect(url);
-}
-
-/**
- * Match every request except:
- *  - /login  (the public gate itself)
- *  - /api/login, /api/logout, /api/stripe/webhook (public endpoints)
- *  - /scan/[id] and /scan/thank-you (public shareable pages)
- *  - Next.js internals and static assets
- */
+// Only run on requests that used to be gated — keeps the edge bundle tiny.
 export const config = {
-  matcher: [
-    '/((?!login|scan/|api/login|api/logout|api/stripe/webhook|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
-  ],
+  matcher: [],
 };

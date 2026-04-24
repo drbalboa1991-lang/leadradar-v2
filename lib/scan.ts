@@ -23,9 +23,11 @@ const PHONE_RE   = /(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
 const EMAIL_RE   = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i; // no `g` — stateful lastIndex breaks .test()
 // Requires a day-name near a time (8am / 9:00) OR an explicit "hours" phrase
 const HOURS_RE   = /\b(mon|tue|wed|thu|fri|sat|sun|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b[\s\S]{0,120}\b(\d{1,2}(:\d{2})?\s*(am|pm)|\d{1,2}:\d{2})\b|\b(business hours|opening hours|hours of operation|store hours|we.re open|we are open|open daily|open 24)\b/i;
-const CTA_RE     = /\b(call|contact|get a quote|free estimate|book|schedule|request|hire|get started|click here)\b/i;
+// CTA must be inside an <a> or <button> element — bare words in body copy don't count
+const CTA_RE     = /<(?:a|button)\b[^>]*>(?:[^<]{0,80})?(?:call\s*(?:us|now)?|contact\s*us|get\s*a?\s*(?:free\s*)?(?:quote|estimate)|book\s*(?:now|online|appointment)?|schedule(?:\s*(?:now|today|a\s*call))?|request\s*(?:a\s*)?(?:quote|estimate|service)|hire\s*us|get\s*started|click\s*here)/i;
 const SOCIAL_RE  = /facebook\.com|instagram\.com|twitter\.com|x\.com|linkedin\.com|yelp\.com|nextdoor\.com/i;
-const ADDRESS_RE = /\b\d{2,5}\s+\w+\s+(st|street|ave|avenue|blvd|boulevard|rd|road|dr|drive|ln|lane|way|ct|court|pl|place)\b/i;
+// Street address: require an actual number + street name + suffix OR a 5-digit ZIP code
+const ADDRESS_RE = /\b\d{2,5}\s+\w[\w\s]{1,30}(?:st|street|ave|avenue|blvd|boulevard|rd|road|dr|drive|ln|lane|way|ct|court|pl|place)\b|\b\d{5}(?:-\d{4})?\b/i;
 
 // ── Pro-tier check regexes (6 deep checks) ────────────────────────────────
 const LIVE_CHAT_RE  = /intercom|drift\.com|freshchat|zendesk|tawk\.to|livechat|crisp\.chat|tidio|chat\.widget|helpscout/i;
@@ -81,14 +83,16 @@ export async function scanWebsite(rawUrl: string): Promise<ScanResult> {
     {
       id: 'email',
       name: 'Email or contact form',
-      passed: EMAIL_RE.test(html) || /contact|form|message/i.test(lower),
+      // Require an actual email address OR a real <form> tag — the word "contact" alone doesn't count
+      passed: EMAIL_RE.test(html) || /<form\b/i.test(html),
       weight: 10,
       tip: "Add a contact form or email address. Customers who can't find how to reach you leave.",
     },
     {
       id: 'address',
       name: 'Street address listed',
-      passed: ADDRESS_RE.test(html) || /address|location|find us/i.test(lower),
+      // Require an actual street address or ZIP code — the word "location" alone doesn't count
+      passed: ADDRESS_RE.test(html),
       weight: 10,
       tip: 'Show your service area or address. Customers need to know you serve their area.',
     },
@@ -197,7 +201,9 @@ export async function scanWebsite(rawUrl: string): Promise<ScanResult> {
     pct >= 0.9 ? 'A' : pct >= 0.75 ? 'B' : pct >= 0.6 ? 'C' : pct >= 0.4 ? 'D' : 'F';
 
   const failedWeight = checks.filter(c => !c.passed).reduce((s, c) => s + c.weight, 0);
-  const missedLeadsPerMonth = Math.round((failedWeight / maxScore) * 18);
+  // Scale: a site failing all free checks loses ~35 leads/month (conservative
+  // estimate for a local service business getting 50-100 monthly site visitors).
+  const missedLeadsPerMonth = Math.round((failedWeight / maxScore) * 35);
 
   return {
     url,
