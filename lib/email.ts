@@ -125,7 +125,9 @@ export async function sendReportEmail(
   const subject = `Your LeadRadar report for ${domain} — Grade ${result.grade} (${result.score}/${result.maxScore})`;
 
   const { error } = await resend.emails.send({
-    from: 'LeadRadar <reports@leadradar.app>',
+    // TODO: switch to 'LeadRadar <reports@leadradar.app>' once leadradar.app
+    // is verified in the Resend dashboard (Domains → Add Domain).
+    from: 'LeadRadar <onboarding@resend.dev>',
     to,
     subject,
     html: buildReportHtml(result, shareUrl),
