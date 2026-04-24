@@ -37,13 +37,10 @@ export async function POST(request: Request) {
 
     const result = await scanWebsite(raw);
 
-    // Persist so the result can be retrieved via /scan/[id]
-    let shareId: string | undefined;
-    try {
-      shareId = await saveScan(result);
-    } catch (saveErr) {
-      console.error('[scan] failed to save result:', saveErr);
-    }
+    // Persist so the result can be retrieved via /scan/[id].
+    // saveScan is fail-open — always returns an ID even if storage is unavailable,
+    // so the payment buttons are never disabled due to a storage error.
+    const shareId = await saveScan(result);
 
     return NextResponse.json({ ok: true, data: result, shareId });
   } catch (err: unknown) {

@@ -15,12 +15,25 @@ export async function saveScan(result: ScanResult): Promise<string> {
   const id = generateId();
 
   if (process.env.KV_REST_API_URL) {
-    const { kv } = await import('@vercel/kv');
-    await kv.set(`lr:scan:${id}`, JSON.stringify(result), { ex: SCAN_TTL_SECONDS });
+    try {
+      const { kv } = await import('@vercel/kv');
+      await kv.set(`lr:scan:${id}`, JSON.stringify(result), { ex: SCAN_TTL_SECONDS });
+    } catch (e) {
+      // KV write failed — return the ID anyway so the payment flow still works.
+      // The share URL won't be retrievable but the in-tab unlock via postMessage will.
+      console.error('[scanStore] KV save failed:', e);
+    }
     return id;
   }
 
-  return saveScanSqlite(id, result);
+  try {
+    return saveScanSqlite(id, result);
+  } catch (e) {
+    // SQLite unavailable (e.g. Vercel serverless) — return the ID so the
+    // payment flow is not broken. Share URLs won't persist.
+    console.error('[scanStore] SQLite save failed:', e);
+    return id;
+  }
 }
 
 export async function getScan(id: string): Promise<ScanResult | null> {
