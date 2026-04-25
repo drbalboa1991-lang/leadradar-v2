@@ -74,6 +74,27 @@
       </span>
       <span id="liveScans" class="tnum">847</span> service pros scanned this week · most recent: <span id="liveRecent" class="tnum">Garage door, Austin TX · 2 min ago</span>
     </p>
+
+    <!-- Beta launch offer strip -->
+    <div class="mt-8 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center gap-4 border" style="background:color-mix(in srgb,var(--brand) 6%,transparent);border-color:color-mix(in srgb,var(--brand) 25%,transparent)">
+      <div class="flex items-center gap-3 shrink-0">
+        <span class="text-2xl" aria-hidden="true">🚀</span>
+        <div>
+          <p class="font-extrabold text-[16px]" style="color:var(--ink)">Beta launch — first 1,000 businesses get the full pro report free</p>
+          <p class="text-[13.5px] muted mt-0.5">No credit card. Scan → enter your email → full analysis hits your inbox.</p>
+        </div>
+      </div>
+      <div class="md:ml-auto shrink-0 w-full md:w-48">
+        <div class="flex items-center justify-between text-[12px] mb-1">
+          <span class="muted">Spots claimed</span>
+          <span class="font-bold" style="color:var(--brand)" id="betaCounter">Loading…</span>
+        </div>
+        <div class="h-2 rounded-full overflow-hidden" style="background:var(--line)">
+          <div id="betaBar" class="h-full rounded-full transition-all" style="background:var(--brand);width:0%"></div>
+        </div>
+        <p class="text-[11px] muted mt-1 text-right" id="betaRemaining"></p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -270,83 +291,106 @@
   <div class="max-w-5xl mx-auto px-5 md:px-6 py-20 md:py-28">
     <p class="muted text-[15px] flex items-center gap-2">
       <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full inline-block" style="background:var(--brand)"></span>
-      Pick your level of help
+      Simple pricing
     </p>
-    <h2 id="pricing-title" class="mt-3 text-[clamp(2rem,6vw,3.6rem)]">Three ways to plug the leak.</h2>
-    <p class="mt-3 text-[16.5px] max-w-xl">Every plan includes continuous scans, competitor alerts, and a live score.</p>
+    <h2 id="pricing-title" class="mt-3 text-[clamp(2rem,6vw,3.6rem)]">Free while we're in beta.</h2>
+    <p class="mt-3 text-[16.5px] max-w-xl">We're giving the first 1,000 businesses the full pro report completely free.
+      In exchange we ask for your email — nothing else.</p>
 
-    <div class="mt-8 surface p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-8" role="note" aria-label="Guarantee and cancellation policy">
-      <div class="flex items-center gap-3">
-        <span aria-hidden="true" class="w-10 h-10 rounded-full grid place-items-center" style="background:var(--good-soft);color:var(--brand)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-        </span>
+    <div class="mt-10 grid md:grid-cols-2 gap-5">
+
+      <!-- Free scan -->
+      <article class="surface p-7 flex flex-col gap-4">
         <div>
-          <p class="font-extrabold text-[17px]">60-day "it paid for itself" guarantee</p>
-          <p class="muted text-[14.5px]">If you don't recover your subscription in new jobs, full refund. No call.</p>
+          <p class="muted text-[12px] uppercase tracking-[0.15em]">Always free</p>
+          <h3 class="mt-2 text-[28px] font-extrabold" style="color:var(--ink)">Free Scan</h3>
+          <p class="mt-1 text-[15px] muted">No account. No email. Just paste your URL.</p>
+        </div>
+        <ul class="space-y-2.5 text-[15px]" style="color:var(--ink)">
+          <li class="flex items-start gap-2"><span style="color:var(--brand)">✓</span> 11 checks across speed, mobile, SEO basics</li>
+          <li class="flex items-start gap-2"><span style="color:var(--brand)">✓</span> Lead score out of 100 (grade A–F)</li>
+          <li class="flex items-start gap-2"><span style="color:var(--brand)">✓</span> Estimated missed leads per month</li>
+          <li class="flex items-start gap-2"><span style="color:var(--brand)">✓</span> Plain-English fix list</li>
+          <li class="flex items-start gap-2"><span style="color:var(--brand)">✓</span> Shareable report link</li>
+        </ul>
+        <a href="#scan" class="mt-auto"><span class="btn btn-ghost w-full">Scan my site — free</span></a>
+      </article>
+
+      <!-- Full pro beta -->
+      <article class="p-7 flex flex-col gap-4 relative" style="background:var(--brand);color:var(--brand-ink);border-radius:var(--radius-lg)">
+        <span class="absolute -top-3 left-7 text-[11px] font-bold tracking-[0.15em] uppercase px-3 py-1 rounded-full" style="background:var(--ink);color:var(--bg)">🚀 Beta — Limited spots</span>
+        <div>
+          <p class="text-[12px] uppercase tracking-[0.15em]" style="color:color-mix(in srgb,var(--brand-ink) 70%,transparent)">First 1,000 businesses</p>
+          <h3 class="mt-2 text-[28px] font-extrabold" style="color:var(--brand-ink)">Full Pro Report</h3>
+          <div class="flex items-baseline gap-2 mt-2">
+            <span class="text-[48px] font-black leading-none" style="color:var(--brand-ink)">Free</span>
+            <span class="text-[16px] line-through" style="color:color-mix(in srgb,var(--brand-ink) 50%,transparent)">$9.99</span>
+          </div>
+          <p class="text-[14px] mt-1" style="color:color-mix(in srgb,var(--brand-ink) 80%,transparent)">Enter your email after scanning. Report arrives in your inbox.</p>
+        </div>
+        <ul class="space-y-2.5 text-[15px]" style="color:var(--brand-ink)">
+          <li class="flex items-start gap-2"><span>✓</span> Everything in Free Scan</li>
+          <li class="flex items-start gap-2"><span>✓</span> 6 deep checks (live chat, reviews, video, FAQ, financing, guarantee)</li>
+          <li class="flex items-start gap-2"><span>✓</span> Google Maps presence check + rating</li>
+          <li class="flex items-start gap-2"><span>✓</span> Industry benchmark — how you rank vs. competitors</li>
+          <li class="flex items-start gap-2"><span>✓</span> Revenue impact calculator</li>
+          <li class="flex items-start gap-2"><span>✓</span> Full report emailed to you — keep it forever</li>
+        </ul>
+        <!-- Live counter -->
+        <div class="mt-2">
+          <div class="flex items-center justify-between text-[12px] mb-1.5">
+            <span style="color:color-mix(in srgb,var(--brand-ink) 70%,transparent)">Spots claimed</span>
+            <span class="font-bold" style="color:var(--brand-ink)" id="pricingBetaCounter">Loading…</span>
+          </div>
+          <div class="h-2 rounded-full overflow-hidden" style="background:color-mix(in srgb,var(--brand-ink) 20%,transparent)">
+            <div id="pricingBetaBar" class="h-full rounded-full" style="background:var(--brand-ink);width:0%;transition:width 0.6s ease"></div>
+          </div>
+        </div>
+        <a href="#scan" class="mt-auto"><span class="btn btn-ink w-full">Scan now — get full report free</span></a>
+      </article>
+    </div>
+
+    <!-- What the checks actually look at -->
+    <div class="mt-14 border-t pt-12" style="border-color:var(--line)">
+      <p class="muted text-[15px] flex items-center gap-2 mb-3">
+        <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full inline-block" style="background:var(--brand)"></span>
+        What we actually check
+      </p>
+      <h3 class="text-[clamp(1.6rem,4vw,2.4rem)] font-extrabold" style="color:var(--ink)">11 checks. Each one a real reason customers don't call.</h3>
+      <p class="mt-3 text-[15.5px] max-w-2xl muted">These aren't vanity metrics. Every check maps to a moment where a real customer closes your site and calls someone else.</p>
+
+      <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="surface p-5 rounded-2xl">
+          <p class="font-bold text-[15px]" style="color:var(--ink)">📱 Mobile-friendly <span class="text-[12px] font-normal muted ml-1">15 pts</span></p>
+          <p class="mt-1 text-[13.5px] muted">60%+ of "plumber near me" searches happen on a phone. A broken mobile layout = instant back button.</p>
+        </div>
+        <div class="surface p-5 rounded-2xl">
+          <p class="font-bold text-[15px]" style="color:var(--ink)">📞 Phone number visible <span class="text-[12px] font-normal muted ml-1">20 pts</span></p>
+          <p class="mt-1 text-[13.5px] muted">Highest-weight check. If a customer can't see your number in 3 seconds, they call the next result.</p>
+        </div>
+        <div class="surface p-5 rounded-2xl">
+          <p class="font-bold text-[15px]" style="color:var(--ink)">🕐 Business hours <span class="text-[12px] font-normal muted ml-1">10 pts</span></p>
+          <p class="mt-1 text-[13.5px] muted">"Are they open right now?" is one of the first questions people ask. No hours = they call someone who answers.</p>
+        </div>
+        <div class="surface p-5 rounded-2xl">
+          <p class="font-bold text-[15px]" style="color:var(--ink)">🔒 HTTPS secure <span class="text-[12px] font-normal muted ml-1">5 pts</span></p>
+          <p class="mt-1 text-[13.5px] muted">Chrome shows "Not Secure" on HTTP sites. ~25% of visitors leave immediately when they see that warning.</p>
+        </div>
+        <div class="surface p-5 rounded-2xl">
+          <p class="font-bold text-[15px]" style="color:var(--ink)">✉️ Contact form or email <span class="text-[12px] font-normal muted ml-1">10 pts</span></p>
+          <p class="mt-1 text-[13.5px] muted">30% of potential customers prefer to fill a form instead of calling. No form = you lose that third.</p>
+        </div>
+        <div class="surface p-5 rounded-2xl">
+          <p class="font-bold text-[15px]" style="color:var(--ink)">📍 Address / service area <span class="text-[12px] font-normal muted ml-1">10 pts</span></p>
+          <p class="mt-1 text-[13.5px] muted">Customers want to know you serve their area. No address = "do they even come here?" = they leave.</p>
         </div>
       </div>
-      <div class="hidden md:block w-px h-10" style="background:var(--line)"></div>
-      <ul class="flex flex-wrap gap-x-5 gap-y-1 text-[14.5px] muted" aria-label="Contract terms">
-        <li><span class="font-semibold text-[color:var(--ink)]">No contract</span></li>
-        <li aria-hidden="true">·</li>
-        <li><span class="font-semibold text-[color:var(--ink)]">No auto-renew</span></li>
-        <li aria-hidden="true">·</li>
-        <li>Cancel in 2 taps — no phone call, no retention form</li>
-      </ul>
+      <p class="mt-5 text-[13.5px] muted text-center">+ 5 more checks: call-to-action button, page title, meta description, social links, structured data</p>
     </div>
 
-    <div class="mt-8 grid md:grid-cols-3 gap-4">
-      <article class="surface p-7 flex flex-col">
-        <p class="muted text-[12px] uppercase tracking-[0.15em]">AI Assistant</p>
-        <h3 class="mt-2 text-[26px]">Hands-on</h3>
-        <p class="mt-4 tnum" style="font-size:52px;font-weight:800;letter-spacing:-0.03em;line-height:1">$79<span class="muted text-[18px] font-semibold ml-1">/mo</span></p>
-        <p class="muted mt-2 text-[14.5px]">For pros who like to ship fixes themselves.</p>
-        <ul class="mt-6 space-y-2.5 text-[15.5px]" style="color:var(--ink)">
-          <li>Weekly scans · live score</li>
-          <li>AI rewrites for GBP &amp; review replies</li>
-          <li>Keyword gap list by ZIP</li>
-          <li>1-click publish to Google Business</li>
-          <li>Competitor overtake alert (SMS)</li>
-        </ul>
-        <p class="mt-5 text-[13px] muted" style="padding-top:14px;border-top:1px dashed var(--line)">Not included: we don't publish fixes for you — you approve and ship.</p>
-        <a href="#" class="mt-auto pt-5"><span class="btn btn-ghost w-full">Start free trial</span></a>
-      </article>
-      <article class="p-7 flex flex-col relative" style="background:var(--brand);color:var(--brand-ink);border-radius:var(--radius-lg)">
-        <span class="absolute -top-3 left-7 text-[11px] font-bold tracking-[0.15em] uppercase px-3 py-1 rounded-full" style="background:var(--ink);color:var(--bg)">Most chosen</span>
-        <p class="text-[12px] uppercase tracking-[0.15em]" style="color:color-mix(in srgb,var(--brand-ink) 75%,transparent)">Full Automation</p>
-        <h3 class="mt-2 text-[26px]" style="color:var(--brand-ink)">Autopilot</h3>
-        <p class="mt-4 tnum" style="font-size:52px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:var(--brand-ink)">$199<span class="text-[18px] font-semibold ml-1" style="color:color-mix(in srgb,var(--brand-ink) 70%,transparent)">/mo</span></p>
-        <p class="mt-2 text-[14.5px]" style="color:color-mix(in srgb,var(--brand-ink) 80%,transparent)">Runs in the background. You see every change before it publishes.</p>
-        <ul class="mt-6 space-y-2.5 text-[15.5px]" style="color:var(--brand-ink)">
-          <li>Daily scans &amp; auto-applied fixes</li>
-          <li>Weekly GBP posts, written for you</li>
-          <li>Review-request automation</li>
-          <li>ZIP landing pages auto-generated</li>
-          <li>Missed-call text-back + lead inbox</li>
-        </ul>
-        <p class="mt-5 text-[13px]" style="padding-top:14px;border-top:1px dashed color-mix(in srgb,var(--brand-ink) 25%,transparent);color:color-mix(in srgb,var(--brand-ink) 75%,transparent)">Not included: paid ads, outbound cold outreach. On purpose.</p>
-        <a href="#" class="mt-auto pt-5"><span class="btn btn-ink w-full">Turn on Autopilot</span></a>
-      </article>
-      <article class="surface p-7 flex flex-col">
-        <p class="muted text-[12px] uppercase tracking-[0.15em]">Done-For-You</p>
-        <h3 class="mt-2 text-[26px]">Concierge</h3>
-        <p class="mt-4 tnum" style="font-size:52px;font-weight:800;letter-spacing:-0.03em;line-height:1">$499<span class="muted text-[18px] font-semibold ml-1">/mo</span></p>
-        <p class="muted mt-2 text-[14.5px]">A real US specialist handles everything.</p>
-        <ul class="mt-6 space-y-2.5 text-[15.5px]" style="color:var(--ink)">
-          <li>Dedicated specialist</li>
-          <li>Full GBP + Yelp + Nextdoor setup</li>
-          <li>Custom ZIP pages &amp; copy</li>
-          <li>Review acquisition campaigns</li>
-          <li>Monthly results call</li>
-        </ul>
-        <p class="mt-5 text-[13px] muted" style="padding-top:14px;border-top:1px dashed var(--line)">Not included: website rebuild. We fix what makes the phone ring, not your site design.</p>
-        <a href="#" class="mt-auto pt-5"><span class="btn btn-ghost w-full">Book a call</span></a>
-      </article>
-    </div>
-
-    <p class="mt-8 text-[15px] muted text-center max-w-2xl mx-auto">
-      A typical scan finds <span class="font-extrabold" style="color:var(--ink)">$8,400–$14,600/month</span> in leaking revenue.
-      Autopilot is <span class="font-extrabold" style="color:var(--brand)">about 2% of that</span>.
+    <p class="mt-12 text-[15px] muted text-center max-w-2xl mx-auto">
+      After beta: one-time report <span class="font-extrabold" style="color:var(--ink)">$9.99</span> or monthly plan <span class="font-extrabold" style="color:var(--ink)">$29/mo</span> for unlimited scans.
+      Beta users locked in free, forever.
     </p>
   </div>
 </section>
@@ -705,5 +749,35 @@
     const idx = Math.floor(Date.now() / 120000) % pool.length;
     liveRecentEl.textContent = pool[idx] + ' · ' + mins[idx] + ' min ago';
   }
+
+  // ── Beta counter (all spots on page) ──────────────────────────────────
+  function updateBetaCounters(count, remaining) {
+    const pct = Math.min(100, (count / 1000) * 100).toFixed(1);
+
+    // Hero strip
+    const heroCounter   = document.getElementById('betaCounter');
+    const heroBar       = document.getElementById('betaBar');
+    const heroRemaining = document.getElementById('betaRemaining');
+    if (heroCounter)   heroCounter.textContent   = count + ' / 1,000';
+    if (heroBar)       heroBar.style.width        = pct + '%';
+    if (heroRemaining) heroRemaining.textContent  = remaining + ' spots left';
+
+    // Pricing section
+    const pricingCounter = document.getElementById('pricingBetaCounter');
+    const pricingBar     = document.getElementById('pricingBetaBar');
+    if (pricingCounter) pricingCounter.textContent = count + ' / 1,000';
+    if (pricingBar)     pricingBar.style.width      = pct + '%';
+  }
+
+  fetch('/api/early-access')
+    .then(r => r.json())
+    .then(d => { if (d.ok) updateBetaCounters(d.count, d.remaining); })
+    .catch(() => {
+      // Fallback — hide counters gracefully
+      ['betaCounter','pricingBetaCounter'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '— / 1,000';
+      });
+    });
 })();
 </script>

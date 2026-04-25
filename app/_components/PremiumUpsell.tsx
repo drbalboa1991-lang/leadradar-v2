@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ScanResult, ScanCheck, GooglePresence } from '@/lib/scan';
+
+const IS_BETA = process.env.NEXT_PUBLIC_EARLY_ACCESS === 'true';
 
 interface Props {
   result: ScanResult;
@@ -215,10 +217,55 @@ function GooglePresenceCard({ presence }: { presence?: GooglePresence }) {
 // ── Main component ────────────────────────────────────────────────────────
 
 export default function PremiumUpsell({ result, scanId, paid }: Props) {
-  const [loading, setLoading] = useState<'onetime' | 'monthly' | null>(null);
+  const [loading,       setLoading]       = useState<'onetime' | 'monthly' | null>(null);
+  const [betaEmail,     setBetaEmail]     = useState('');
+  const [betaStatus,    setBetaStatus]    = useState<'idle' | 'sending' | 'sent' | 'full' | 'error'>('idle');
+  const [betaCount,     setBetaCount]     = useState<number | null>(null);
+  const [betaRemaining, setBetaRemaining] = useState<number | null>(null);
+
   const benchmark = getBenchmark(result.score);
   const roi       = getRoi(result);
   const proChecks = result.proChecks ?? [];
+
+  // Fetch beta counter on mount (only in beta mode)
+  useEffect(() => {
+    if (!IS_BETA) return;
+    fetch('/api/early-access')
+      .then(r => r.json())
+      .then(d => {
+        if (d.ok) {
+          setBetaCount(d.count);
+          setBetaRemaining(d.remaining);
+          if (!d.open) setBetaStatus('full');
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  async function handleBetaSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!betaEmail.trim()) return;
+    setBetaStatus('sending');
+    try {
+      const res  = await fetch('/api/early-access', {
+        method:  'POST',
+        headers: { 'content-type': 'application/json' },
+        body:    JSON.stringify({ email: betaEmail, result, shareId: scanId }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setBetaStatus('sent');
+        setBetaCount(data.count);
+        setBetaRemaining(data.remaining);
+      } else if (data.error === 'early_access_full') {
+        setBetaStatus('full');
+      } else {
+        setBetaStatus('error');
+      }
+    } catch {
+      setBetaStatus('error');
+    }
+  }
 
   async function handlePay(plan: 'onetime' | 'monthly') {
     if (!scanId) return;
@@ -376,48 +423,143 @@ export default function PremiumUpsell({ result, scanId, paid }: Props) {
         </div>
       </LockedCard>
 
-      {/* CTA */}
-      <div className="rounded-2xl border p-6 text-center space-y-4"
-        style={{ borderColor: 'var(--brand)', background: 'color-mix(in srgb,var(--brand) 5%,transparent)' }}>
-        <div>
-          <p className="font-extrabold text-lg" style={{ color: 'var(--ink)' }}>Unlock your full pro report</p>
-          <p className="text-sm mt-1" style={{ color: 'var(--muted, #6b7280)' }}>
-            Benchmark vs. industry · revenue calculator · 6 deep checks
+      {/* CTA — beta email form or Stripe */}
+      {IS_BETA && betaStatus !== 'full' ? (
+        <div className="rounded-2xl border p-6 space-y-4"
+          style={{ borderColor: 'var(--brand)', background: 'color-mix(in srgb,var(--brand) 5%,transparent)' }}>
+
+          {/* Counter */}
+          {betaCount !== null && betaRemaining !== null && (
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--line)' }}>
+                <div className="h-full rounded-full transition-all"
+                  style={{ width: `${(betaCount / 1000) * 100}%`, background: 'var(--brand)' }} />
+              </div>
+              <span className="text-xs font-semibold shrink-0" style={{ color: 'var(--brand)' }}>
+                {betaRemaining} of 1,000 spots left
+              </span>
+            </div>
+          )}
+
+          <div>
+            <span className="text-xs font-bold tracking-widest uppercase px-2 py-0.5 rounded-full"
+              style={{ background: 'var(--brand)', color: '#fff' }}>
+              🚀 Beta Launch — Free
+            </span>
+            <p className="font-extrabold text-lg mt-2" style={{ color: 'var(--ink)' }}>
+              Get your full pro analysis — free
+            </p>
+            <p className="text-sm mt-1" style={{ color: 'var(--muted, #6b7280)' }}>
+              Enter your email. We send you the complete report instantly.
+              No credit card. No catch. First 1,000 businesses only.
+            </p>
+          </div>
+
+          {/* What's included */}
+          <div className="grid grid-cols-2 gap-1.5 text-xs" style={{ color: 'var(--ink)' }}>
+            {['📊 Industry benchmark', '💰 Revenue calculator', '✨ 6 deep checks', '🗺️ Google Maps status'].map(item => (
+              <div key={item} className="flex items-center gap-1.5">
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+
+          {betaStatus === 'sent' ? (
+            <div className="text-center py-3">
+              <p className="text-2xl mb-1">✉️</p>
+              <p className="font-extrabold" style={{ color: 'var(--brand)' }}>Report on its way!</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--muted, #6b7280)' }}>
+                Check your inbox — full analysis with all pro checks inside.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleBetaSubmit} className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="email"
+                value={betaEmail}
+                onChange={e => setBetaEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+                disabled={betaStatus === 'sending'}
+                className="flex-1 px-4 py-3 rounded-xl border text-sm disabled:opacity-60 outline-none"
+                style={{ borderColor: 'var(--line)', background: 'var(--bg)', color: 'var(--ink)' }}
+              />
+              <button
+                type="submit"
+                disabled={betaStatus === 'sending'}
+                className="px-5 py-3 rounded-xl text-sm font-bold shrink-0 disabled:opacity-60 transition-opacity"
+                style={{ background: 'var(--brand)', color: '#fff' }}
+              >
+                {betaStatus === 'sending' ? 'Sending…' : 'Send my free report →'}
+              </button>
+            </form>
+          )}
+
+          {betaStatus === 'error' && (
+            <p className="text-xs" style={{ color: '#ef4444' }}>Something went wrong. Please try again.</p>
+          )}
+
+          <p className="text-xs" style={{ color: 'var(--muted, #6b7280)' }}>
+            We store your email to send the report and occasional updates.
+            Unsubscribe any time. See our <a href="/privacy" style={{ color: 'var(--brand)' }}>Privacy Policy</a>.
           </p>
         </div>
-
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={() => handlePay('onetime')}
-            disabled={!scanId || loading !== null}
-            className="flex-1 flex flex-col items-center gap-1 px-4 py-4 rounded-xl border transition-opacity hover:opacity-90 disabled:opacity-50"
-            style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb,var(--bg) 80%,transparent)' }}
-          >
-            <span className="text-2xl font-black" style={{ color: 'var(--ink)' }}>$9.99</span>
-            <span className="text-xs font-semibold" style={{ color: 'var(--ink)' }}>
-              {loading === 'onetime' ? 'Opening…' : 'One-time deep scan'}
-            </span>
-            <span className="text-xs" style={{ color: 'var(--muted, #6b7280)' }}>This report only · instant access</span>
-          </button>
-
-          <button
-            onClick={() => handlePay('monthly')}
-            disabled={!scanId || loading !== null}
-            className="flex-1 flex flex-col items-center gap-1 px-4 py-4 rounded-xl transition-opacity hover:opacity-90 disabled:opacity-50"
-            style={{ background: 'var(--brand)', color: 'var(--brand-ink)' }}
-          >
-            <span className="text-2xl font-black">$29</span>
-            <span className="text-xs font-semibold">
-              {loading === 'monthly' ? 'Opening…' : '/ month Pro'}
-            </span>
-            <span className="text-xs opacity-80">Unlimited scans · monthly reports</span>
-          </button>
+      ) : IS_BETA && betaStatus === 'full' ? (
+        /* Beta is full — show Stripe */
+        <div className="rounded-2xl border p-5 text-center space-y-2"
+          style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb,var(--bg) 90%,transparent)' }}>
+          <p className="font-extrabold" style={{ color: 'var(--ink)' }}>Beta spots filled 🎉</p>
+          <p className="text-sm" style={{ color: 'var(--muted, #6b7280)' }}>
+            All 1,000 free spots are taken. Unlock your full report below.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 mt-3">
+            <button onClick={() => handlePay('onetime')} disabled={!scanId || loading !== null}
+              className="flex-1 px-4 py-3 rounded-xl border text-sm font-bold disabled:opacity-50 hover:opacity-90 transition-opacity"
+              style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb,var(--bg) 80%,transparent)', color: 'var(--ink)' }}>
+              {loading === 'onetime' ? 'Opening…' : '$9.99 one-time'}
+            </button>
+            <button onClick={() => handlePay('monthly')} disabled={!scanId || loading !== null}
+              className="flex-1 px-4 py-3 rounded-xl text-sm font-bold disabled:opacity-50 hover:opacity-90 transition-opacity"
+              style={{ background: 'var(--brand)', color: '#fff' }}>
+              {loading === 'monthly' ? 'Opening…' : '$29/month — unlimited'}
+            </button>
+          </div>
         </div>
-
-        <p className="text-xs" style={{ color: 'var(--muted, #6b7280)' }}>
-          No hidden fees &nbsp;·&nbsp; Cancel any time &nbsp;·&nbsp; Results in seconds
-        </p>
-      </div>
+      ) : (
+        /* Not beta — show Stripe normally */
+        <div className="rounded-2xl border p-6 text-center space-y-4"
+          style={{ borderColor: 'var(--brand)', background: 'color-mix(in srgb,var(--brand) 5%,transparent)' }}>
+          <div>
+            <p className="font-extrabold text-lg" style={{ color: 'var(--ink)' }}>Unlock your full pro report</p>
+            <p className="text-sm mt-1" style={{ color: 'var(--muted, #6b7280)' }}>
+              Benchmark vs. industry · revenue calculator · 6 deep checks
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button onClick={() => handlePay('onetime')} disabled={!scanId || loading !== null}
+              className="flex-1 flex flex-col items-center gap-1 px-4 py-4 rounded-xl border transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb,var(--bg) 80%,transparent)' }}>
+              <span className="text-2xl font-black" style={{ color: 'var(--ink)' }}>$9.99</span>
+              <span className="text-xs font-semibold" style={{ color: 'var(--ink)' }}>
+                {loading === 'onetime' ? 'Opening…' : 'One-time deep scan'}
+              </span>
+              <span className="text-xs" style={{ color: 'var(--muted, #6b7280)' }}>This report only · instant access</span>
+            </button>
+            <button onClick={() => handlePay('monthly')} disabled={!scanId || loading !== null}
+              className="flex-1 flex flex-col items-center gap-1 px-4 py-4 rounded-xl transition-opacity hover:opacity-90 disabled:opacity-50"
+              style={{ background: 'var(--brand)', color: 'var(--brand-ink)' }}>
+              <span className="text-2xl font-black">$29</span>
+              <span className="text-xs font-semibold">
+                {loading === 'monthly' ? 'Opening…' : '/ month Pro'}
+              </span>
+              <span className="text-xs opacity-80">Unlimited scans · monthly reports</span>
+            </button>
+          </div>
+          <p className="text-xs" style={{ color: 'var(--muted, #6b7280)' }}>
+            No hidden fees &nbsp;·&nbsp; Cancel any time
+          </p>
+        </div>
+      )}
     </div>
   );
 }
