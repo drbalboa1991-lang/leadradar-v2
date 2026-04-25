@@ -20,7 +20,7 @@ export default function ScanResultCard({ result }: { result: ScanResult }) {
     <div className="space-y-4">
       {/* Score header */}
       <div
-        className="card-lift flex items-center gap-6 p-6 rounded-2xl border"
+        className="flex items-center gap-6 p-6 rounded-2xl border"
         style={{
           borderColor: 'var(--line)',
           background: 'color-mix(in srgb,var(--bg) 90%,transparent)',

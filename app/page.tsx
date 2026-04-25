@@ -38,17 +38,15 @@ export default async function HomePage() {
     <>
       {/* Scan section — above landing content so it's the first thing logged-in users see */}
       <section
-        className="bg-mesh max-w-5xl mx-auto px-5 md:px-6 pt-14 pb-12 text-center"
+        className="max-w-5xl mx-auto px-5 md:px-6 pt-14 pb-12 text-center"
       >
-        <h1 className="fade-up text-3xl md:text-4xl font-extrabold tracking-tight mb-3" style={{ color: 'var(--ink)' }}>
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3" style={{ color: 'var(--ink)' }}>
           See the customers your website is losing
         </h1>
-        <p className="fade-up text-base mb-8" style={{ color: 'var(--muted, #6b7280)' }}>
+        <p className="text-base mb-8" style={{ color: 'var(--muted, #6b7280)' }}>
           Paste your URL. Get your score in 10 seconds.
         </p>
-        <div className="fade-up">
-          <ScanForm />
-        </div>
+        <ScanForm />
       </section>
 
       <div suppressHydrationWarning dangerouslySetInnerHTML={{ __html: html }} />
