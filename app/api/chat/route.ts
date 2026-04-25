@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import Groq from 'groq-sdk';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -35,7 +35,7 @@ GRADES:
 - F: below 40pts — site is actively costing them customers
 
 PRO REPORT ($9.99 one-time or $29/month):
-6 deep checks: live chat widget, customer reviews displayed on-site, video content, FAQ section, financing/payment plan options, satisfaction guarantee. Plus industry benchmark comparison, revenue impact calculator.
+6 deep checks: live chat widget, customer reviews displayed on-site, video content, FAQ section, financing/payment plan options, satisfaction guarantee. Plus industry benchmark comparison and revenue impact calculator.
 
 PRICING:
 - Free scan: always free, no account needed
@@ -44,10 +44,10 @@ PRICING:
 
 PERSONALITY:
 - Friendly, direct, practical — like a knowledgeable friend, not a salesperson
-- Give specific actionable advice, not vague suggestions
+- Give specific, actionable advice — not vague suggestions
 - If someone shares their score or grade, help them understand what it means and what to fix first
 - Keep replies concise — 2-4 short paragraphs max
-- Don't oversell the pro report; recommend it only when genuinely useful
+- Don't oversell the pro report; only recommend it when genuinely useful
 - If you don't know something, say so rather than guessing`;
 
 interface Message {
@@ -56,7 +56,7 @@ interface Message {
 }
 
 export async function POST(req: Request) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ ok: false, error: 'AI not configured' }, { status: 503 });
   }
@@ -69,21 +69,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: 'messages_required' }, { status: 400 });
     }
 
-    // Sanitise — only keep valid roles, limit history to last 20 messages
+    // Sanitise — valid roles only, limit to last 20 messages, cap content length
     const clean = messages
       .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
       .slice(-20)
       .map(m => ({ role: m.role, content: m.content.slice(0, 2000) }));
 
-    const client = new Anthropic({ apiKey });
-    const response = await client.messages.create({
-      model:      'claude-haiku-4-5',
+    const groq = new Groq({ apiKey });
+    const completion = await groq.chat.completions.create({
+      model:      'llama-3.1-8b-instant', // fast, free, great for Q&A
       max_tokens: 512,
-      system:     SYSTEM_PROMPT,
-      messages:   clean,
+      messages:   [{ role: 'system', content: SYSTEM_PROMPT }, ...clean],
     });
 
-    const text = response.content[0]?.type === 'text' ? response.content[0].text : '';
+    const text = completion.choices[0]?.message?.content ?? '';
     return NextResponse.json({ ok: true, message: text });
   } catch (err) {
     console.error('[chat]', err);
