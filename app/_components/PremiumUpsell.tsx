@@ -286,13 +286,28 @@ export default function PremiumUpsell({ result, scanId, paid }: Props) {
   }
 
   // ── UNLOCKED VIEW ──────────────────────────────────────────────────────
-  if (paid) {
+  // Unlock pro view: either via Stripe payment OR beta email submission
+  const isUnlocked = paid || betaStatus === 'sent';
+
+  if (isUnlocked) {
     const proFailed = proChecks.filter(c => !c.passed);
     const proScore  = proChecks.filter(c => c.passed).reduce((s, c) => s + c.weight, 0);
     const proMax    = proChecks.reduce((s, c) => s + c.weight, 0);
 
     return (
       <div className="mt-6 space-y-5">
+        {/* Unlock banner */}
+        {betaStatus === 'sent' && (
+          <div className="rounded-xl px-4 py-3 flex items-center gap-3"
+            style={{ background: 'color-mix(in srgb,var(--brand) 10%,transparent)', border: '1px solid color-mix(in srgb,var(--brand) 30%,transparent)' }}>
+            <span className="text-lg">✉️</span>
+            <div>
+              <p className="text-sm font-bold" style={{ color: 'var(--brand)' }}>Full report unlocked + sent to your inbox</p>
+              <p className="text-xs" style={{ color: 'var(--muted, #6b7280)' }}>The complete analysis is also on its way to your email — keep it forever.</p>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-3 py-3 border-t" style={{ borderColor: 'var(--brand)' }}>
           <div className="flex-1 h-px" style={{ background: 'var(--brand)' }} />
           <span className="text-xs font-bold tracking-widest uppercase px-3" style={{ color: 'var(--brand)' }}>
@@ -464,15 +479,7 @@ export default function PremiumUpsell({ result, scanId, paid }: Props) {
             ))}
           </div>
 
-          {betaStatus === 'sent' ? (
-            <div className="text-center py-3">
-              <p className="text-2xl mb-1">✉️</p>
-              <p className="font-extrabold" style={{ color: 'var(--brand)' }}>Report on its way!</p>
-              <p className="text-xs mt-1" style={{ color: 'var(--muted, #6b7280)' }}>
-                Check your inbox — full analysis with all pro checks inside.
-              </p>
-            </div>
-          ) : (
+          {(
             <form onSubmit={handleBetaSubmit} className="flex flex-col sm:flex-row gap-2">
               <input
                 type="email"
