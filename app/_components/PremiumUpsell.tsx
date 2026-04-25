@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { ScanResult, ScanCheck } from '@/lib/scan';
+import type { ScanResult, ScanCheck, GooglePresence } from '@/lib/scan';
 
 interface Props {
   result: ScanResult;
@@ -103,6 +103,115 @@ function ProCheckRow({ check }: { check: ScanCheck }) {
   );
 }
 
+// ── Google Maps presence card ─────────────────────────────────────────────
+
+function GooglePresenceCard({ presence }: { presence?: GooglePresence }) {
+  if (!presence) return null;
+
+  const stars = presence.rating
+    ? '★'.repeat(Math.round(presence.rating)) + '☆'.repeat(5 - Math.round(presence.rating))
+    : null;
+
+  return (
+    <UnlockedCard icon="🗺️" title="Google Maps Presence">
+      {presence.found ? (
+        <div className="space-y-3">
+          {/* Found row */}
+          <div className="flex items-center gap-2">
+            <span className="text-base">✅</span>
+            <span className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>
+              {presence.name ? `"${presence.name}" found on Google Maps` : 'Business found on Google Maps'}
+            </span>
+            {presence.isVerified && (
+              <span className="text-xs px-2 py-0.5 rounded-full font-semibold"
+                style={{ background: 'color-mix(in srgb,var(--brand) 12%,transparent)', color: 'var(--brand)' }}>
+                Verified
+              </span>
+            )}
+          </div>
+
+          {/* Rating */}
+          {presence.rating && (
+            <div className="flex items-center gap-3 p-3 rounded-xl"
+              style={{ background: 'color-mix(in srgb,var(--bg) 60%,transparent)', border: '1px solid var(--line)' }}>
+              <div>
+                <p className="text-2xl font-black leading-none" style={{ color: 'var(--ink)' }}>
+                  {presence.rating.toFixed(1)}
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: '#f59e0b', letterSpacing: '0.05em' }}>
+                  {stars}
+                </p>
+              </div>
+              <div className="h-8 w-px" style={{ background: 'var(--line)' }} />
+              <div>
+                <p className="text-sm font-bold" style={{ color: 'var(--ink)' }}>
+                  {presence.reviewCount} review{presence.reviewCount !== 1 ? 's' : ''}
+                </p>
+                <p className="text-xs" style={{ color: 'var(--muted, #6b7280)' }}>
+                  {(presence.reviewCount ?? 0) < 20
+                    ? 'Under 20 reviews — many customers won\'t trust you yet'
+                    : (presence.reviewCount ?? 0) < 50
+                    ? 'Getting there — 50+ is the trust threshold'
+                    : 'Good review volume — keep it growing'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Photos */}
+          <div className="flex items-center gap-2">
+            <span>{presence.hasPhotos ? '✅' : '❌'}</span>
+            <span className="text-xs" style={{ color: 'var(--muted, #6b7280)' }}>
+              {presence.hasPhotos
+                ? 'Business has photos on Google Maps'
+                : 'No photos on Google Maps — listings with photos get 42% more direction requests'}
+            </span>
+          </div>
+
+          {/* Link */}
+          {presence.mapsUrl && (
+            <a href={presence.mapsUrl} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-semibold hover:underline"
+              style={{ color: 'var(--brand)' }}>
+              View on Google Maps →
+            </a>
+          )}
+
+          {/* Mock disclaimer */}
+          {presence.isMock && (
+            <p className="text-xs italic mt-1" style={{ color: 'var(--muted, #6b7280)' }}>
+              * Preview data — live Google lookup coming soon
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-base">❌</span>
+            <span className="text-sm font-semibold" style={{ color: 'var(--accent, #B8371A)' }}>
+              Business not found on Google Maps
+            </span>
+          </div>
+          <p className="text-xs" style={{ color: 'var(--muted, #6b7280)' }}>
+            "Near me" searches are the #1 way local customers find service pros.
+            Without a Google Business Profile you are invisible to most mobile searchers.
+          </p>
+          <a href="https://business.google.com" target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-semibold hover:underline"
+            style={{ color: 'var(--brand)' }}>
+            Claim your free Google Business Profile →
+          </a>
+          {presence.isMock && (
+            <p className="text-xs italic" style={{ color: 'var(--muted, #6b7280)' }}>
+              * Preview data — live Google lookup coming soon
+            </p>
+          )}
+        </div>
+      )}
+    </UnlockedCard>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────
 
 export default function PremiumUpsell({ result, scanId, paid }: Props) {
@@ -184,6 +293,9 @@ export default function PremiumUpsell({ result, scanId, paid }: Props) {
             </p>
           </div>
         </UnlockedCard>
+
+        {/* Google Maps presence */}
+        <GooglePresenceCard presence={result.googlePresence} />
 
         {/* Deep pro checklist */}
         <UnlockedCard icon="✨" title={`Pro Deep Scan — ${proScore}/${proMax} pts`}>

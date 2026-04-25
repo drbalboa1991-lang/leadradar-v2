@@ -1,3 +1,7 @@
+import type { GooglePresence } from './googlePlaces';
+
+export type { GooglePresence };
+
 export interface ScanCheck {
   id: string;
   name: string;
@@ -16,6 +20,8 @@ export interface ScanResult {
   proChecks: ScanCheck[];
   missedLeadsPerMonth: number;
   scannedAt: string;
+  /** Google Maps / Places presence — populated for pro users */
+  googlePresence?: GooglePresence;
 }
 
 // ── Free-tier check regexes ────────────────────────────────────────────────
@@ -205,6 +211,10 @@ export async function scanWebsite(rawUrl: string): Promise<ScanResult> {
   // estimate for a local service business getting 50-100 monthly site visitors).
   const missedLeadsPerMonth = Math.round((failedWeight / maxScore) * 35);
 
+  // Google Maps presence — runs in parallel, never blocks the scan
+  const { lookupGooglePresence } = await import('./googlePlaces');
+  const googlePresence = await lookupGooglePresence(url, html).catch(() => undefined);
+
   return {
     url,
     score,
@@ -214,5 +224,6 @@ export async function scanWebsite(rawUrl: string): Promise<ScanResult> {
     proChecks,
     missedLeadsPerMonth,
     scannedAt: new Date().toISOString(),
+    googlePresence,
   };
 }
