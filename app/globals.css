@@ -263,6 +263,166 @@ section { scroll-margin-top: 80px; }
   .btn { min-height: 56px; font-size: 16.5px; }
 }
 
+/* ================================================================
+   Visual effects layer (SuperWhisper-inspired, color-preserving).
+   None of these change brand colours — they only add motion + depth.
+   ================================================================ */
+
+/* Animated gradient blobs floating in the hero background.
+   Apply to a relatively-positioned section; uses ::before + ::after. */
+.bg-mesh {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.bg-mesh::before,
+.bg-mesh::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  will-change: transform;
+}
+.bg-mesh::before {
+  width: 620px;
+  height: 620px;
+  background: var(--brand);
+  opacity: 0.18;
+  top: -240px;
+  right: -120px;
+  animation: blob-float-a 22s ease-in-out infinite;
+}
+.bg-mesh::after {
+  width: 520px;
+  height: 520px;
+  background: color-mix(in srgb, var(--brand) 55%, var(--accent));
+  opacity: 0.14;
+  bottom: -220px;
+  left: -100px;
+  animation: blob-float-b 28s ease-in-out infinite;
+}
+@keyframes blob-float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(40px, -30px) scale(1.08); }
+  66%      { transform: translate(-30px, 20px) scale(0.96); }
+}
+@keyframes blob-float-b {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(-40px, 30px) scale(1.05); }
+  66%      { transform: translate(30px, -20px) scale(0.94); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-mesh::before, .bg-mesh::after { animation: none; }
+}
+
+/* Soft glow halo behind primary CTAs.
+   Sits behind the button so the button colours stay untouched. */
+.btn-glow {
+  position: relative;
+  isolation: isolate;
+}
+.btn-glow::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  background: var(--brand);
+  border-radius: inherit;
+  filter: blur(20px);
+  opacity: 0.32;
+  transition: opacity .3s ease, filter .3s ease;
+}
+.btn-glow:hover::after {
+  opacity: 0.55;
+  filter: blur(26px);
+}
+
+/* Subtle lift on hover for cards */
+.card-lift {
+  transition: transform .25s cubic-bezier(.25, 1, .5, 1),
+              box-shadow .25s cubic-bezier(.25, 1, .5, 1);
+  will-change: transform;
+}
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px -18px color-mix(in srgb, var(--ink) 22%, transparent);
+}
+
+/* Shimmer sweep — for premium/locked cards.
+   The gradient is brand-coloured so the existing palette is preserved. */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    color-mix(in srgb, var(--brand) 22%, transparent) 50%,
+    transparent 65%
+  );
+  background-size: 250% 100%;
+  background-position: 200% 0;
+  animation: shimmer-sweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes shimmer-sweep {
+  0%   { background-position: 200% 0; }
+  60%  { background-position: -100% 0; }
+  100% { background-position: -100% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer::after { animation: none; opacity: 0; }
+}
+
+/* Animated gradient border — eye-catching on the pro upsell card */
+.gradient-border {
+  position: relative;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  z-index: -1;
+  background: linear-gradient(
+    120deg,
+    var(--brand),
+    color-mix(in srgb, var(--brand) 55%, var(--accent)),
+    var(--brand)
+  );
+  background-size: 220% 220%;
+  border-radius: inherit;
+  animation: gradient-shift 6s ease infinite;
+}
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gradient-border::before { animation: none; }
+}
+
+/* Scroll-triggered fade-up — uses native scroll-driven animations
+   where supported (Chromium 115+). Graceful no-op on older browsers. */
+@supports (animation-timeline: view()) {
+  .fade-up {
+    animation: fade-up linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 28%;
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
 /* ---- /login page specific ---- */
 .login-wrap {
   min-height: 100dvh;

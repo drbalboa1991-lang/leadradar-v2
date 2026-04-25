@@ -109,7 +109,7 @@ export default function ScanForm() {
         <button
           type="submit"
           disabled={status === 'scanning'}
-          className="px-6 py-3 rounded-lg text-sm font-bold shrink-0 disabled:opacity-60 transition-opacity"
+          className="btn-glow px-6 py-3 rounded-lg text-sm font-bold shrink-0 disabled:opacity-60 transition-opacity"
           style={{ background: 'var(--brand)', color: 'var(--brand-ink)' }}
         >
           {status === 'scanning' ? 'Scanning…' : 'Scan my site'}
@@ -131,7 +131,7 @@ export default function ScanForm() {
           <ScanResultCard result={result} />
 
           {/* Email report capture */}
-          <div className="p-5 rounded-2xl border"
+          <div className="card-lift p-5 rounded-2xl border"
             style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb,var(--bg) 90%,transparent)' }}>
             <p className="text-sm font-bold mb-1" style={{ color: 'var(--ink)' }}>
               📬 Email me this report

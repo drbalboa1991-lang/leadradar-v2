@@ -34,7 +34,7 @@ function LockedCard({ icon, title, subtitle, children }: {
   icon: string; title: string; subtitle: string; children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border overflow-hidden" style={{ borderColor: 'var(--line)' }}>
+    <div className="card-lift rounded-2xl border overflow-hidden" style={{ borderColor: 'var(--line)' }}>
       <div className="px-5 py-4 border-b flex items-center gap-3"
         style={{ borderColor: 'var(--line)', background: 'color-mix(in srgb,var(--bg) 85%,transparent)' }}>
         <span className="text-xl">{icon}</span>
@@ -265,7 +265,7 @@ export default function PremiumUpsell({ result, scanId, paid }: Props) {
       </LockedCard>
 
       {/* CTA */}
-      <div className="rounded-2xl border p-6 text-center space-y-4"
+      <div className="gradient-border shimmer card-lift rounded-2xl border p-6 text-center space-y-4"
         style={{ borderColor: 'var(--brand)', background: 'color-mix(in srgb,var(--brand) 5%,transparent)' }}>
         <div>
           <p className="font-extrabold text-lg" style={{ color: 'var(--ink)' }}>Unlock your full pro report</p>
