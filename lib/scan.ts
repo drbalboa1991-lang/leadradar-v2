@@ -30,7 +30,7 @@ const SOCIAL_RE  = /facebook\.com|instagram\.com|twitter\.com|x\.com|linkedin\.c
 const ADDRESS_RE = /\b\d{2,5}\s+\w[\w\s]{1,30}(?:st|street|ave|avenue|blvd|boulevard|rd|road|dr|drive|ln|lane|way|ct|court|pl|place)\b|\b\d{5}(?:-\d{4})?\b/i;
 
 // ── Pro-tier check regexes (6 deep checks) ────────────────────────────────
-const LIVE_CHAT_RE  = /intercom|drift\.com|freshchat|zendesk|tawk\.to|livechat|crisp\.chat|tidio|chat\.widget|helpscout/i;
+const LIVE_CHAT_RE  = /intercom|drift\.com|freshchat|zendesk|tawk\.to|livechat|crisp\.chat|tidio|chat\.widget|helpscout|data-leadradar-chat/i;
 const REVIEWS_RE    = /google.*review|review.*google|yelp.*review|trustpilot|birdeye|podium|reviews\.io|g2\.com|capterra|stamped\.io|elfsight.*review/i;
 const VIDEO_RE      = /youtube\.com\/embed|youtu\.be|vimeo\.com\/video|<video\b/i;
 const FAQ_RE        = /\bfaq\b|frequently.asked|common.question/i;
