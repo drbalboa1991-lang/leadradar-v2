@@ -286,3 +286,154 @@ section { scroll-margin-top: 80px; }
   color: var(--ink);
 }
 .login-input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* ================================================================
+   PREMIUM HOVER + SCROLL EFFECTS
+   Inspired by SuperWhisper — adapted to LeadRadar brand colors.
+   All effects respect prefers-reduced-motion.
+   ================================================================ */
+
+/* ── Scroll-reveal ───────────────────────────────────────────────
+   Add data-reveal to any element. JS adds .is-visible when it
+   enters the viewport. data-reveal-delay="N" staggers siblings.  */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-reveal-delay="1"] { transition-delay: 0.08s; }
+[data-reveal-delay="2"] { transition-delay: 0.16s; }
+[data-reveal-delay="3"] { transition-delay: 0.24s; }
+[data-reveal-delay="4"] { transition-delay: 0.32s; }
+[data-reveal-delay="5"] { transition-delay: 0.40s; }
+[data-reveal-delay="6"] { transition-delay: 0.48s; }
+
+/* ── Free pricing card hover ─────────────────────────────────────
+   Radial glow rises from bottom on hover.                        */
+.pricing-free-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.pricing-free-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 90% 55% at 50% 110%,
+    color-mix(in srgb, var(--brand) 14%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.55s ease;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.pricing-free-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 52px color-mix(in srgb, var(--brand) 14%, transparent);
+}
+.pricing-free-card:hover::before { opacity: 1; }
+
+/* ── Pro/beta pricing card hover (SuperWhisper gradient-slide) ───
+   Gradient slides upward on hover — background-position trick.  */
+.pricing-pro-card {
+  background-size: 100% 200% !important;
+  background-position: 0 100% !important;
+  background-image: linear-gradient(
+    to top,
+    var(--brand)                                          0%,
+    color-mix(in srgb, var(--brand) 78%, #000)           45%,
+    color-mix(in srgb, var(--brand) 55%, #000)          100%
+  ) !important;
+  transition:
+    background-position 0.9s ease,
+    transform 0.35s ease,
+    box-shadow 0.35s ease !important;
+}
+.pricing-pro-card:hover {
+  background-position: 0 0% !important;
+  transform: translateY(-8px) !important;
+  box-shadow:
+    0 32px 72px color-mix(in srgb, var(--brand) 28%, transparent),
+    0 0 0 1px  color-mix(in srgb, var(--brand) 50%, transparent) !important;
+}
+
+/* ── Feature / check cards hover ────────────────────────────────
+   Subtle lift + brand glow + gradient tint.                      */
+.check-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.check-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--brand) 9%, transparent) 0%,
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.check-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 36px color-mix(in srgb, var(--brand) 13%, transparent);
+  border-color: color-mix(in srgb, var(--brand) 38%, transparent) !important;
+}
+.check-card:hover::after { opacity: 1; }
+
+/* ── Shimmer border on active/featured cards ─────────────────────
+   Glowing animated border — mask-composite trick from SuperWhisper */
+.shimmer-border {
+  position: relative;
+}
+.shimmer-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--brand) 90%, #fff) 0%,
+    color-mix(in srgb, var(--brand) 40%, #fff) 30%,
+    color-mix(in srgb, var(--brand) 60%, #000) 60%,
+    color-mix(in srgb, var(--brand) 90%, #fff) 100%
+  );
+  background-size: 200% 200%;
+  animation: shimmer-border-spin 4s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+@keyframes shimmer-border-spin {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Reduced motion overrides ────────────────────────────────────*/
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .pricing-free-card,
+  .pricing-pro-card,
+  .check-card {
+    transition: none !important;
+  }
+  .shimmer-border::before { animation: none; }
+}
